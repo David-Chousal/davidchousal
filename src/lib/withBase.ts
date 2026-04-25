@@ -6,8 +6,9 @@ export function withBase(url: string): string {
   if (!url) return url;
   if (!url.startsWith("/")) return url;
 
-  const base = (import.meta as any).env?.BASE_URL as string | undefined;
-  const baseUrl = typeof base === "string" ? base : "/";
+  // Important: reference `import.meta.env.BASE_URL` directly so Astro/Vite can
+  // statically substitute the correct base at build time.
+  const baseUrl = import.meta.env.BASE_URL ?? "/";
 
   // BASE_URL is usually "/" or "/repo/". Normalize without trailing slash.
   const prefix = baseUrl === "/" ? "" : baseUrl.replace(/\/$/, "");
