@@ -72,18 +72,22 @@ export async function mountHeroEmbed(opts: {
   const html = await res.text();
   const doc = new DOMParser().parseFromString(html, "text/html");
 
-  // Load CSS/JS dependencies first.
+  // Collect dependencies.
   const assets = collectAssets(doc, indexUrl);
-  assets.filter((a) => a.type === "style").forEach((a) => ensureStylesheet(a.url));
-  for (const s of assets.filter((a) => a.type === "script")) {
-    // eslint-disable-next-line no-await-in-loop
-    await ensureScript(s.url);
-  }
 
-  // Inject markup.
+  // Load styles first (so layout is correct ASAP).
+  assets.filter((a) => a.type === "style").forEach((a) => ensureStylesheet(a.url));
+
+  // Inject markup before running scripts (many embeds query DOM on execute).
   opts.mountEl.innerHTML = extractBodyHtml(doc);
 
   // Best-effort: remove any duplicate <link> or <script> tags that were inlined in body.
   opts.mountEl.querySelectorAll("link[rel='stylesheet'], script[src]").forEach((n) => n.remove());
+
+  // Then load scripts in order (external libs before embed script).
+  for (const s of assets.filter((a) => a.type === "script")) {
+    // eslint-disable-next-line no-await-in-loop
+    await ensureScript(s.url);
+  }
 }
 
