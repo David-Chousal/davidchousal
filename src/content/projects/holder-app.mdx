@@ -72,6 +72,7 @@ videos:
 
 import CaseStudySection from "../../components/portfolio/CaseStudySection.astro";
 import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
+import { withBase } from "../../lib/withBase";
 
 <CaseStudySection id="overview" kicker="HolderApp — verifiable credentials">
 
@@ -93,7 +94,7 @@ import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
 
 <figure class="not-prose mt-6 flex flex-col items-center">
   <img
-    src="/images/holder/qr-demo.png"
+    src={withBase("/images/holder/qr-demo.png")}
     alt="QR-mediated verifier request and holder response demo"
     class="w-full max-w-[220px] rounded-lg border border-case-ink/10 bg-case-ink/[0.02]"
     loading="lazy"

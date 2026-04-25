@@ -1,15 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import AboutPhotoCarousel from "../components/AboutPhotoCarousel.astro";
+import { withBase } from "../lib/withBase";
 
 const aboutPortrait = {
-  src: "/images/about/about-carousel1.png",
+  src: withBase("/images/about/about-carousel1.png"),
   alt: "Portrait",
 } as const;
 
 const aboutCarouselSlides = [
-  { src: "/images/about/about-carousel2.png", alt: "Snapshot 2" },
-  { src: "/images/about/about-carousel3.png", alt: "Snapshot 3" },
+  { src: withBase("/images/about/about-carousel2.png"), alt: "Snapshot 2" },
+  { src: withBase("/images/about/about-carousel3.png"), alt: "Snapshot 3" },
 ] as const;
 ---
 
@@ -103,7 +104,7 @@ const aboutCarouselSlides = [
     <section class="space-y-4">
       <h2 class="font-pp-mori text-xs tracking-wide text-[#2a2520]/60">RESUME</h2>
       <a
-        href="/resume.pdf"
+        href={withBase("/resume.pdf")}
         class="inline-flex items-center gap-2 border border-[#2a2520]/25 px-4 py-2 text-sm text-[#2a2520]/90 transition-colors duration-150 hover:bg-[#2a2520] hover:text-[#f5f1ec]"
       >
         Download Resume

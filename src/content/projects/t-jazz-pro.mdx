@@ -66,6 +66,7 @@ toc:
 
 import CaseStudySection from "../../components/portfolio/CaseStudySection.astro";
 import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
+import { withBase } from "../../lib/withBase";
 
 <CaseStudySection id="overview" kicker="T-Jazz Pro — practice companion">
 
@@ -89,7 +90,7 @@ import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
 
 <figure class="not-prose my-8 w-[min(220px,78vw)] shrink-0 rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(260px,70vw)]">
   <img
-    src="/images/t-jazz/t-jazz-homepage.png"
+    src={withBase("/images/t-jazz/t-jazz-homepage.png")}
     alt="T-Jazz Pro library and session list in the simulator"
     width="1206"
     height="2622"
@@ -143,7 +144,7 @@ Domain  &lt;--models--  Persistence / Services
 
 <figure class="not-prose my-8 w-[min(220px,78vw)] rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(260px,70vw)]">
   <img
-    src="/images/t-jazz/t-jazz-homepage-2.png"
+    src={withBase("/images/t-jazz/t-jazz-homepage-2.png")}
     alt="T-Jazz Pro navigation and layered SwiftUI surfaces"
     width="1206"
     height="2622"
@@ -185,8 +186,8 @@ Domain  &lt;--models--  Persistence / Services
     controls
     playsinline
     preload="metadata"
-    poster="/images/t-jazz/t-jazz-tuner-demo.png"
-    src="/images/t-jazz/t-jazz-tuner-demo.mov"
+    poster={withBase("/images/t-jazz/t-jazz-tuner-demo.png")}
+    src={withBase("/images/t-jazz/t-jazz-tuner-demo.mov")}
   />
   <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
     Practice — tuner and metering in the session surface
@@ -221,7 +222,7 @@ Domain  &lt;--models--  Persistence / Services
 <div class="not-prose my-8 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
   <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)]">
     <img
-      src="/images/t-jazz/t-jazz-tuner-demo.png"
+      src={withBase("/images/t-jazz/t-jazz-tuner-demo.png")}
       alt="T-Jazz Pro tuner and practice tools"
       width="1206"
       height="2622"
@@ -234,7 +235,7 @@ Domain  &lt;--models--  Persistence / Services
   </figure>
   <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)]">
     <img
-      src="/images/t-jazz/t-jazz-settings-demo.png"
+      src={withBase("/images/t-jazz/t-jazz-settings-demo.png")}
       alt="T-Jazz Pro settings and app preferences"
       width="1206"
       height="2622"
@@ -247,7 +248,7 @@ Domain  &lt;--models--  Persistence / Services
   </figure>
   <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)] sm:col-span-2 lg:col-span-1">
     <img
-      src="/images/t-jazz-pro.png"
+      src={withBase("/images/t-jazz-pro.png")}
       alt="T-Jazz Pro transcription and review UI"
       width="800"
       height="600"
@@ -292,7 +293,7 @@ Domain  &lt;--models--  Persistence / Services
 
 <figure class="not-prose my-8 w-[min(200px,72vw)] rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(240px,55%)]">
   <img
-    src="/images/t-jazz/t-jazz-new-session-preview.png"
+    src={withBase("/images/t-jazz/t-jazz-new-session-preview.png")}
     alt="T-Jazz Pro new session with chart before recording or import"
     width="1206"
     height="2622"

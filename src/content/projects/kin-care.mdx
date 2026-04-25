@@ -71,6 +71,7 @@ toc:
 
 import CaseStudySection from "../../components/portfolio/CaseStudySection.astro";
 import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
+import { withBase } from "../../lib/withBase";
 
 <CaseStudySection id="overview" kicker="Kin — family coordination">
 
@@ -93,7 +94,7 @@ import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
 
 <figure class="not-prose my-8 w-[min(220px,78vw)] shrink-0 rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(260px,70vw)]">
   <img
-    src="/images/kin/kin-home.png"
+    src={withBase("/images/kin/kin-home.png")}
     alt="Kin home feed showing daily care overview"
     width="780"
     height="1688"
@@ -141,7 +142,7 @@ import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
 
 <figure class="not-prose my-6 w-[min(200px,72vw)] rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:my-8 sm:w-[min(220px,50%)]">
   <img
-    src="/images/kin/settings-page.png"
+    src={withBase("/images/kin/settings-page.png")}
     alt="Kin settings screen with language and preferences"
     width="1206"
     height="2622"
@@ -218,7 +219,7 @@ Expo app  --Supabase client--&gt;  Postgres / Auth / Realtime
 <div class="not-prose my-8 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
   <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)]">
     <img
-      src="/images/kin/medications-page.png"
+      src={withBase("/images/kin/medications-page.png")}
       alt="Kin medications screen with dose list and scheduling"
       width="1206"
       height="2622"
@@ -231,7 +232,7 @@ Expo app  --Supabase client--&gt;  Postgres / Auth / Realtime
   </figure>
   <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)]">
     <img
-      src="/images/kin/doctors-page.png"
+      src={withBase("/images/kin/doctors-page.png")}
       alt="Kin doctors directory and visit-related care"
       width="1206"
       height="2622"
@@ -244,7 +245,7 @@ Expo app  --Supabase client--&gt;  Postgres / Auth / Realtime
   </figure>
   <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)] sm:col-span-2 lg:col-span-1">
     <img
-      src="/images/kin/tasks-page.png"
+      src={withBase("/images/kin/tasks-page.png")}
       alt="Kin tasks list for household day-to-day work"
       width="1206"
       height="2622"
@@ -268,8 +269,8 @@ Expo app  --Supabase client--&gt;  Postgres / Auth / Realtime
     controls
     playsinline
     preload="metadata"
-    poster="/images/kin/doctors-page.png"
-    src="/images/kin/kin-ai-summary-demo.mov"
+    poster={withBase("/images/kin/doctors-page.png")}
+    src={withBase("/images/kin/kin-ai-summary-demo.mov")}
   />
   <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
     Visit prep — AI-assisted summary in-app (routed through <code class="text-case-ink/55">llm-gateway</code>)

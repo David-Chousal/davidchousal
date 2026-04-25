@@ -6,13 +6,17 @@ import type { HeroIllustrationSlide, HeroSlideDefinition } from "./types";
 import { createMatterHeroSlide } from "./slides/matterHeroSlide";
 import { createRiveHeroSlide } from "./slides/slideRive";
 import { createDuckPondSlide } from "./slides/slideDuckPond";
-import { createHeroEmbedInlineSlide } from "./slides/slideHeroEmbedInline";
+import { createIframeHeroSlide } from "./slides/slideIframeEmbed";
+import { withBase } from "../withBase";
 
 const RIVE_SLIDE: HeroSlideDefinition = {
   id: "rive",
   label: "Rive",
   disableSwipe: false,
-  create: createRiveHeroSlide({ src: "/rive/hero.riv", fallbackSrc: "/rive/hero-fallback.svg" }),
+  create: createRiveHeroSlide({
+    src: withBase("/rive/hero.riv"),
+    fallbackSrc: withBase("/rive/hero-fallback.svg"),
+  }),
 };
 
 /** Third carousel slide only — stays in the page hero. */
@@ -24,11 +28,9 @@ export const moreWorkIllustrationDefinitions: HeroSlideDefinition[] = [
     id: "embed-svg-puzzle",
     label: "SVG puzzle",
     disableSwipe: true,
-    create: createHeroEmbedInlineSlide({
-      basePath: "/hero-embeds/svg-puzzle",
+    create: createIframeHeroSlide({
+      src: withBase("/hero-embeds/svg-puzzle/index.html"),
       title: "Animated interactive SVG puzzle",
-      wrapperClassName:
-        "relative flex h-full min-h-[160px] w-full flex-col overflow-hidden rounded-[inherit] bg-[lightyellow]",
     }),
   },
   { id: "matter-picnic", label: "Sunny picnic", disableSwipe: true, create: createMatterHeroSlide("sunnyPicnic") },
@@ -37,11 +39,9 @@ export const moreWorkIllustrationDefinitions: HeroSlideDefinition[] = [
     id: "embed-pinocchio",
     label: "Pinocchio",
     disableSwipe: true,
-    create: createHeroEmbedInlineSlide({
-      basePath: "/hero-embeds/pinocchio",
+    create: createIframeHeroSlide({
+      src: withBase("/hero-embeds/pinocchio/index.html"),
       title: "Pure CSS Pinocchio",
-      wrapperClassName:
-        "relative flex h-full min-h-[160px] w-full flex-col overflow-hidden rounded-[inherit] bg-[#C6EBF2]",
     }),
   },
 ];
