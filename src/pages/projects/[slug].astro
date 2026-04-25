@@ -1,0 +1,162 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ProjectMedia from "../../components/ProjectMedia.astro";
+import ProjectMeta from "../../components/ProjectMeta.astro";
+import ProjectLinks from "../../components/ProjectLinks.astro";
+import CaseStudyShell from "../../components/portfolio/CaseStudyShell.astro";
+import CaseStudyHero from "../../components/portfolio/CaseStudyHero.astro";
+import CaseStudyMetaGrid from "../../components/portfolio/CaseStudyMetaGrid.astro";
+import CaseStudyLinks from "../../components/portfolio/CaseStudyLinks.astro";
+import NoteCallout from "../../components/portfolio/NoteCallout.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const data = project.data;
+const { Content } = await render(project);
+
+/** Some MDX frontmatters stringify booleans; `.mdx` entries should always use the case study shell unless opted out. */
+function resolveCaseStudy(
+  entry: CollectionEntry<"projects">,
+  raw: CollectionEntry<"projects">["data"],
+): boolean {
+  const flag = raw.caseStudy;
+  if (flag === false || flag === "false") return false;
+  if (flag === true || flag === "true") return true;
+  const path =
+    entry.filePath ??
+    (entry as { _internal?: { filePath?: string } })._internal?.filePath ??
+    "";
+  const normalized = path.replace(/\\/g, "/");
+  if (normalized.endsWith(".mdx")) return true;
+  return false;
+}
+
+const isCaseStudy = resolveCaseStudy(project, data);
+const pageDescription = data.seoDescription ?? data.description;
+const themeColor = isCaseStudy ? "#f5f1ec" : undefined;
+
+const bottomNav = [
+  { label: "Work", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Extras", href: "/extras" },
+];
+
+const toc =
+  data.toc && data.toc.length > 0
+    ? data.toc
+    : [{ id: "overview", label: "OVERVIEW" }];
+---
+
+<Layout
+  title={`${data.title} | David Chousal`}
+  variant={isCaseStudy ? "caseStudy" : "default"}
+  description={pageDescription}
+  themeColor={themeColor}
+>
+  {
+    isCaseStudy ? (
+      <CaseStudyShell
+        projectTitle={data.title}
+        toc={toc}
+        bottomNav={bottomNav}
+        currentPath={Astro.url.pathname}
+      >
+        <CaseStudyHero
+          title={data.title}
+          description={data.description}
+          tags={data.tags}
+          year={data.year}
+          logo={data.logo}
+          heroVideos={data.heroVideos}
+          thumbnail={data.thumbnail}
+          pillAmbientBgUrl={data.landingFrameHoverBg}
+        />
+        <div class="w-full bg-case-canvas px-4">
+          <div class="space-y-10 pb-12 pt-2 md:space-y-14 md:pb-16">
+            <div class="space-y-4 md:space-y-6">
+              {data.note && (
+                <NoteCallout>
+                  <p>{data.note}</p>
+                </NoteCallout>
+              )}
+              <CaseStudyMetaGrid
+                role={data.role}
+                roles={data.roles}
+                duration={data.duration}
+                skills={data.skills}
+                technologies={data.technologies}
+                tools={data.tools}
+                team={data.team}
+              />
+              <CaseStudyLinks
+                liveUrl={data.liveUrl}
+                relatedLinks={data.relatedLinks}
+                fallbackUrl={data.link}
+                fallbackLabel="Source / repository"
+              />
+            </div>
+            <div class="case-study-prose-root">
+              <Content />
+            </div>
+            {data.videos && data.videos.length > 0 && (
+              <div class="case-study-legacy-media border-t border-case-ink/10 pt-10">
+                <ProjectMedia videos={data.videos} />
+              </div>
+            )}
+          </div>
+        </div>
+      </CaseStudyShell>
+    ) : (
+      <div class="mx-auto max-w-4xl px-0 py-0 md:px-0">
+        <a href="/" class="mb-8 inline-block font-medium text-blue-600 hover:text-blue-700">
+          ← Back to Projects
+        </a>
+
+        <header class="mb-12">
+          <h1 class="mb-4 text-4xl font-bold md:text-5xl">{data.title}</h1>
+          <p class="mb-6 text-xl text-gray-600">{data.description}</p>
+          <ProjectLinks githubUrl={data.link} />
+        </header>
+
+        {data.longDescription && (
+          <section class="prose prose-sm mb-12 max-w-none">
+            <p class="text-lg leading-relaxed text-gray-700">{data.longDescription}</p>
+          </section>
+        )}
+
+        <ProjectMeta role={data.role} technologies={data.technologies} tags={data.tags} />
+
+        {data.videos && <ProjectMedia videos={data.videos} />}
+
+        <div class="mt-16 border-t border-gray-200 pt-8">
+          <a href="/" class="font-medium text-blue-600 hover:text-blue-700">
+            ← Back to all projects
+          </a>
+        </div>
+      </div>
+    )
+  }
+</Layout>
+
+<style is:global>
+  .case-study-legacy-media .text-white,
+  .case-study-legacy-media .text-lg {
+    color: color-mix(in oklab, var(--color-case-ink) 85%, transparent);
+  }
+  .case-study-legacy-media .bg-gray-900 {
+    background-color: color-mix(in oklab, var(--color-case-ink) 6%, transparent);
+  }
+</style>

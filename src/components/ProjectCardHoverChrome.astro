@@ -1,0 +1,111 @@
+---
+interface LandingChromeResolved {
+  topRight: "none" | "external";
+  bottomRight: "none" | "code" | "scraps" | "scraps+code";
+}
+
+interface Props {
+  chrome: LandingChromeResolved;
+  /** Background image for frosted pills when the parent card is hovered */
+  pillHoverBgUrl?: string;
+}
+
+const { chrome, pillHoverBgUrl } = Astro.props;
+
+const pillWrap =
+  "relative isolate flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded border border-white/20 bg-white/30 shadow-sm backdrop-blur-md transition-[background-color,box-shadow] duration-300 group-hover:border-white/35 group-hover:bg-white/15";
+
+const showTop = chrome.topRight === "external";
+const showBottom =
+  chrome.bottomRight !== "none" &&
+  (chrome.bottomRight === "code" ||
+    chrome.bottomRight === "scraps" ||
+    chrome.bottomRight === "scraps+code");
+const showScraps =
+  chrome.bottomRight === "scraps" || chrome.bottomRight === "scraps+code";
+const showCode =
+  chrome.bottomRight === "code" || chrome.bottomRight === "scraps+code";
+
+const hoverBgStyle = pillHoverBgUrl
+  ? { backgroundImage: `url("${pillHoverBgUrl.replace(/"/g, "%22")}")` }
+  : undefined;
+---
+
+{
+  showTop && (
+    <div
+      class="pointer-events-none absolute right-3 top-3 z-20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+      aria-hidden="true"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
+      >
+        <path d="M7 17L17 7M17 7H7M17 7V17" />
+      </svg>
+    </div>
+  )
+}
+
+{
+  showBottom && (
+    <div
+      class="pointer-events-none absolute bottom-3 right-3 z-20 flex items-center gap-1.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+      aria-hidden="true"
+    >
+      {showScraps && (
+        <div class={pillWrap}>
+          {pillHoverBgUrl && (
+            <div
+              class="pointer-events-none absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              style={hoverBgStyle}
+            />
+          )}
+          <div class="relative z-10 flex items-center justify-center drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">
+            <svg width="10" height="12" viewBox="0 0 8 12" fill="none" class="shrink-0">
+              <rect x="0" y="0" width="4" height="4" rx="2" fill="#E07A5F" fill-opacity="0.9" />
+              <rect x="4" y="0" width="4" height="4" rx="2" fill="#9D84B7" fill-opacity="0.9" />
+              <rect x="0" y="4" width="4" height="4" rx="2" fill="#6B9BD1" fill-opacity="0.9" />
+              <rect x="0" y="8" width="4" height="4" rx="2" fill="#67B99A" fill-opacity="0.9" />
+              <circle cx="6" cy="6" r="2" fill="#67B99A" fill-opacity="0.9" />
+            </svg>
+          </div>
+        </div>
+      )}
+      {showCode && (
+        <div class={pillWrap}>
+          {pillHoverBgUrl && (
+            <div
+              class="pointer-events-none absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              style={hoverBgStyle}
+            />
+          )}
+          <div class="relative z-10 flex items-center justify-center drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
+            <svg
+              width="14"
+              height="11"
+              viewBox="0 0 11 9"
+              fill="none"
+              class="shrink-0 text-black/70"
+            >
+              <path
+                d="M3 2L1 4.5L3 7M8 2L10 4.5L8 7M6.5 1L4.5 8"
+                stroke="currentColor"
+                stroke-width="1.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

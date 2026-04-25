@@ -1,0 +1,287 @@
+---
+import type { LocalImageProps } from "astro:assets";
+import { Image } from "astro:assets";
+import ProjectCardHoverChrome from "./ProjectCardHoverChrome.astro";
+
+type RasterMeta = Extract<LocalImageProps["src"], { width: number; height: number }>;
+
+interface Props {
+  title: string;
+  description: string;
+  tags: string[];
+  thumbnail: string;
+  slug: string;
+  /** Tighter frame and type — work index grid */
+  compact?: boolean;
+  /** Cream landing grid (reference: baothiento projects) */
+  variant?: "default" | "landing";
+  logo?: string;
+  /** First grid-hover preview video URL (e.g. .mp4); optional */
+  previewVideoUrl?: string;
+  /** Video fills the frame (paused); play on hover — use with `previewVideoUrl` */
+  landingVideoHero?: boolean;
+  /** Poster for hero video (`thumbnail` used when omitted) */
+  videoPosterUrl?: string;
+  /** Background image on frosted hover pills when card is hovered */
+  pillHoverBgUrl?: string;
+  /** Full pill: photo/texture shown when the card is hovered (gray at rest). Omit = warm gradient. */
+  landingFrameHoverBg?: string;
+  /** Larger mockup in the pill (`large` uses more of the frame; parent overflow-clip). */
+  landingMediaProminence?: "default" | "large";
+  /** Local raster for responsive srcset; falls back to `thumbnail` string */
+  thumbnailSrc?: RasterMeta;
+  /** Resolved landing hover affordances */
+  landingHoverChrome?: {
+    topRight: "none" | "external";
+    bottomRight: "none" | "code" | "scraps" | "scraps+code";
+  };
+}
+
+const {
+  title,
+  description,
+  tags,
+  thumbnail,
+  slug,
+  compact = false,
+  variant = "default",
+  logo,
+  previewVideoUrl,
+  landingVideoHero = false,
+  videoPosterUrl,
+  pillHoverBgUrl,
+  landingFrameHoverBg,
+  landingMediaProminence = "default",
+  thumbnailSrc,
+  landingHoverChrome = { topRight: "none", bottomRight: "code" },
+} = Astro.props;
+const isLanding = variant === "landing";
+const showVideo = Boolean(previewVideoUrl && /\.(mp4|webm|mov)(\?|$)/i.test(previewVideoUrl));
+const videoHero = Boolean(landingVideoHero && showVideo);
+const posterForVideo = videoPosterUrl ?? thumbnail;
+
+const frameHoverImageStyle = landingFrameHoverBg
+  ? { backgroundImage: `url("${landingFrameHoverBg.replace(/"/g, "%22")}")` }
+  : undefined;
+
+const frameOuter = isLanding
+  ? "relative mb-4 aspect-[4.01/3] w-full overflow-hidden rounded-[1.75rem] shadow-[0_14px_40px_-22px_rgba(42,37,32,0.14)] ring-1 ring-black/[0.06] transition-[box-shadow] duration-500 [contain:layout] group-hover:shadow-[0_18px_48px_-20px_rgba(42,37,32,0.18)]"
+  : compact
+    ? "rounded-xl p-2 sm:p-2.5 mb-3 bg-stone-100 border border-stone-200/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-1px_0_rgba(0,0,0,0.04)]"
+    : "rounded-2xl p-2.5 sm:p-3 mb-4 bg-stone-100 border border-stone-200/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-1px_0_rgba(0,0,0,0.04)]";
+
+const frameInner = isLanding
+  ? "absolute inset-0 overflow-hidden"
+  : compact
+    ? "aspect-[4/3] overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-stone-200/40"
+    : "aspect-[4/3] overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-stone-200/40";
+
+const titleCls = isLanding
+  ? "font-pp-mori min-w-0 text-base font-medium text-[#2a2520]/90 transition-colors group-hover:text-[#2a2520]/70"
+  : compact
+    ? "text-xs font-medium text-gray-900 tracking-tight"
+    : "text-sm font-medium text-gray-900 tracking-tight";
+
+const descCls = isLanding
+  ? "font-pp-mori line-clamp-2 text-sm leading-snug text-[#2a2520]/50"
+  : compact
+    ? "text-xs text-gray-500 leading-snug line-clamp-2"
+    : "text-sm text-gray-500 leading-snug line-clamp-2";
+
+const tagPill = isLanding
+  ? "font-pp-mori whitespace-nowrap rounded bg-black/[0.04] px-1.5 py-0.5 text-[10px] text-[#2a2520]/40"
+  : compact
+    ? "whitespace-nowrap rounded-full bg-white/90 px-2 py-0.5 text-[0.625rem] font-medium text-gray-600 ring-1 ring-stone-200/80 shadow-sm"
+    : "whitespace-nowrap rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-stone-200/80 shadow-sm";
+
+const landingMediaLarge = landingMediaProminence === "large";
+const landingMediaSlotClass = videoHero
+  ? "pointer-events-none absolute inset-0 z-[12] flex min-h-0 min-w-0 items-center justify-center p-1 sm:p-2"
+  : landingMediaLarge
+    ? "pointer-events-none absolute inset-0 z-[12] flex min-h-0 min-w-0 items-center justify-center p-2 sm:p-3"
+    : "pointer-events-none absolute inset-0 z-[12] flex min-h-0 min-w-0 items-center justify-center p-4 sm:p-7";
+const landingMediaBoxClass = videoHero
+  ? "relative flex h-full min-h-0 min-w-0 max-h-[100%] w-full max-w-[100%] items-center justify-center"
+  : landingMediaLarge
+    ? "relative flex h-full min-h-0 min-w-0 max-h-[98%] w-full max-w-[96%] items-center justify-center"
+    : "relative flex h-full min-h-0 min-w-0 max-h-[94%] w-full max-w-[90%] items-center justify-center";
+---
+
+<a
+  href={`/projects/${slug}`}
+  class:list={[
+    isLanding ? "group flex cursor-pointer flex-col" : "group block cursor-pointer",
+    !isLanding && "transition-[opacity,transform] duration-200 hover:opacity-90",
+  ]}
+  {...(videoHero ? { "data-video-hero-card": "" } : {})}
+>
+  {
+    isLanding ? (
+      <>
+        <div class={frameOuter}>
+          {
+            landingFrameHoverBg ? (
+              <div
+                class="pointer-events-none absolute inset-0 z-0 scale-[1.03] bg-cover bg-center opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+                style={frameHoverImageStyle}
+                aria-hidden="true"
+              />
+            ) : (
+              <div
+                class="pointer-events-none absolute inset-0 z-0 bg-gradient-to-br from-[#a89888] via-[#7d6a5c] to-[#4a3d36] opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+                aria-hidden="true"
+              />
+            )
+          }
+
+          <div
+            class="pointer-events-none absolute inset-0 z-[1] bg-[#e6e4e1] shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] transition-opacity duration-500 ease-out opacity-100 group-hover:opacity-0"
+            aria-hidden="true"
+          />
+
+          <span
+            class="pointer-events-none absolute left-0 right-0 top-1 z-[18] h-[1.5px] will-change-transform"
+            style="opacity: 0.7; background: linear-gradient(to right, transparent, rgb(255, 255, 255) 50%, transparent); filter: blur(1px); box-shadow: rgba(255, 255, 255, 0.6) 0px 0px 8px; contain: paint;"
+            aria-hidden="true"
+          />
+          <span
+            class="pointer-events-none absolute bottom-1 left-[30%] right-0 z-[18] h-px will-change-transform"
+            style="opacity: 0.55; background: linear-gradient(to right, transparent 10%, rgba(255, 255, 255, 0.95) 60%, transparent); filter: blur(1px); box-shadow: rgba(255, 255, 255, 0.4) 0px 0px 6px; contain: paint;"
+            aria-hidden="true"
+          />
+          <span
+            class="pointer-events-none absolute left-1 top-1 z-[18] h-[30px] w-[30px] will-change-transform"
+            style="opacity: 0.5; background: radial-gradient(circle at left top, rgba(255, 255, 255, 0.9) 0%, transparent 70%); filter: blur(2px); contain: paint;"
+            aria-hidden="true"
+          />
+          <span
+            class="pointer-events-none absolute right-1 top-1 z-[18] h-[27px] w-[27px] will-change-transform"
+            style="opacity: 0.4; background: radial-gradient(circle at right top, rgba(255, 255, 255, 0.8) 0%, transparent 70%); filter: blur(2px); contain: paint;"
+            aria-hidden="true"
+          />
+          <span
+            class="pointer-events-none absolute bottom-1 right-1 z-[18] h-[33px] w-[33px] will-change-transform"
+            style="opacity: 0.4; background: radial-gradient(circle at right bottom, rgba(255, 255, 255, 0.8) 0%, transparent 70%); filter: blur(2px); contain: paint;"
+            aria-hidden="true"
+          />
+
+          <div class:list={[landingMediaSlotClass, "overflow-hidden"]}>
+            <div class={landingMediaBoxClass}>
+              {!videoHero && (
+                <div class="relative inline-flex h-full max-h-full max-w-full items-center justify-center">
+                  <div
+                    class:list={[
+                      "relative z-0 transition-opacity duration-500 ease-out",
+                      showVideo && "opacity-100 group-hover:opacity-0",
+                    ]}
+                  >
+                    {thumbnailSrc ? (
+                      <Image
+                        src={thumbnailSrc}
+                        alt={title}
+                        widths={[256, 384, 640, 750, 828, 1080, 1200]}
+                        sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 450px"
+                        class="max-h-full max-w-full object-contain"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <img
+                        src={thumbnail}
+                        alt={title}
+                        class="max-h-full max-w-full object-contain"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                  </div>
+                  {showVideo && (
+                    <video
+                      src={previewVideoUrl}
+                      class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-contain opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+                      muted
+                      loop
+                      playsinline
+                      preload="none"
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+              )}
+
+              {videoHero && (
+                <div class="relative inline-flex h-full max-h-full max-w-full items-center justify-center">
+                  <img
+                    src={posterForVideo}
+                    alt={title}
+                    class="relative z-0 max-h-full max-w-full object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <video
+                    src={previewVideoUrl}
+                    class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-contain opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    aria-hidden="true"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <ProjectCardHoverChrome chrome={landingHoverChrome} pillHoverBgUrl={pillHoverBgUrl} />
+        </div>
+
+        <div class="px-1">
+          <div class="mb-2 flex items-start justify-between">
+            <div class="flex min-w-0 items-center gap-2">
+              <h3 class={titleCls}>{title}</h3>
+              {logo && (
+                <img src={logo} alt="" class="h-[14px] w-auto shrink-0 object-contain" loading="lazy" />
+              )}
+            </div>
+            <div class="ml-2 flex shrink-0 flex-nowrap gap-1 overflow-hidden">
+              {tags.map((tag) => (
+                <span class={tagPill}>{tag}</span>
+              ))}
+            </div>
+          </div>
+          <p class={descCls}>{description}</p>
+        </div>
+      </>
+    ) : (
+      <>
+        <div class={frameOuter}>
+          <div class={frameInner}>
+            <img
+              src={thumbnail}
+              alt={title}
+              class:list={[
+                "h-full w-full object-cover",
+                compact
+                  ? "transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                  : "transition-transform duration-300 ease-out group-hover:scale-[1.02]",
+              ]}
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-1.5 px-1">
+          <div class="flex items-start justify-between gap-2 sm:gap-3">
+            <h2 class={`min-w-0 flex-1 ${titleCls}`}>{title}</h2>
+            <ul class="m-0 flex shrink-0 list-none flex-wrap justify-end gap-1 p-0 sm:gap-1.5">
+              {tags.map((tag) => (
+                <li class={tagPill}>{tag}</li>
+              ))}
+            </ul>
+          </div>
+          <p class={descCls}>{description}</p>
+        </div>
+      </>
+    )
+  }
+</a>

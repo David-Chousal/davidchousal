@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full min-h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matter.js headless + DOM sync</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+</head>
+<body class="m-0 min-h-full bg-slate-900 p-0">
+  <!--
+    Standalone playground (CDN Matter 0.19). Production hero carousel uses the same DOM-sync idea in:
+    src/lib/hero-carousel/slides/matterHeroSlide.ts (Matter 0.20, themed slides, full pause/destroy lifecycle).
+    HTML structure: full-screen scene root (mouse target for Matter).
+    Background canvas is pointer-events-none for future FX; objects are synced from invisible physics bodies.
+  -->
+  <div
+    id="scene"
+    class="relative h-[100dvh] min-h-screen w-full cursor-grab overflow-hidden bg-gradient-to-b from-slate-800 to-slate-900 active:cursor-grabbing"
+  >
+    <!-- Background canvas: visual effects later; no pointer hit-testing -->
+    <canvas id="fx" class="pointer-events-none absolute inset-0 z-0 h-full w-full"></canvas>
+
+    <!-- Object 1 -->
+    <div
+      id="obj0"
+      class="pointer-events-none absolute left-0 top-0 z-10 h-[72px] w-[72px] cursor-pointer will-change-transform"
+      aria-hidden="true"
+    >
+      <svg class="h-full w-full" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36" cy="36" r="28" fill="#fbbf24" stroke="#b45309" stroke-width="3" />
+        <circle cx="26" cy="30" r="4" fill="#1e293b" />
+        <circle cx="46" cy="30" r="4" fill="#1e293b" />
+        <path d="M24 48 Q36 58 48 48" fill="none" stroke="#1e293b" stroke-width="3" stroke-linecap="round" />
+      </svg>
+    </div>
+
+    <!-- Object 2: simple duck-ish silhouette -->
+    <div
+      id="obj1"
+      class="pointer-events-none absolute left-0 top-0 z-10 h-[72px] w-[72px] cursor-pointer will-change-transform"
+      aria-hidden="true"
+    >
+      <svg class="h-full w-full" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="38" cy="40" rx="22" ry="18" fill="#f97316" />
+        <circle cx="38" cy="28" r="16" fill="#f97316" />
+        <polygon points="58,30 72,26 58,22" fill="#fb923c" />
+        <circle cx="44" cy="26" r="3" fill="#1e293b" />
+      </svg>
+    </div>
+
+    <!-- Object 3 -->
+    <div
+      id="obj2"
+      class="pointer-events-none absolute left-0 top-0 z-10 h-[72px] w-[72px] cursor-pointer will-change-transform"
+      aria-hidden="true"
+    >
+      <svg class="h-full w-full" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="52" height="52" rx="12" fill="#38bdf8" stroke="#0369a1" stroke-width="3" />
+        <circle cx="36" cy="36" r="8" fill="#e0f2fe" />
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    function init() {
+      if (typeof Matter === 'undefined') {
+        document.body.insertAdjacentHTML(
+          'beforeend',
+          '<p style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:1rem;background:#450a0a;color:#fecaca;font-family:system-ui">Matter.js did not load (check network / CDN). Reload the page.</p>'
+        );
+        return;
+      }
+
+      const { Engine, Runner, World, Bodies, Body, Mouse, MouseConstraint, Events, Query } = Matter;
+
+      const scene = document.getElementById('scene');
+      const canvas = document.getElementById('fx');
+      const els = [
+        document.getElementById('obj0'),
+        document.getElementById('obj1'),
+        document.getElementById('obj2'),
+      ];
+
+      /** Resize background canvas to match scene (DPR-aware for future drawing). */
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        const w = scene.clientWidth;
+        const h = scene.clientHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      /** Wall thickness for static bounds outside the viewport. */
+      function wallThickness() {
+        return 80;
+      }
+
+      /** Build static bounds just outside the viewport in pixel/world space. */
+      function createBounds(width, height) {
+        const t = wallThickness();
+        const ground = Bodies.rectangle(width / 2, height + t / 2, width + t * 4, t, {
+          isStatic: true,
+          label: 'ground',
+        });
+        const left = Bodies.rectangle(-t / 2, height / 2, t, height + t * 4, {
+          isStatic: true,
+          label: 'left',
+        });
+        const right = Bodies.rectangle(width + t / 2, height / 2, t, height + t * 4, {
+          isStatic: true,
+          label: 'right',
+        });
+        return [ground, left, right];
+      }
+
+      resizeCanvas();
+
+      const width = scene.clientWidth;
+      const height = scene.clientHeight;
+
+      // --- Engine / world (headless: no Matter.Render) ---
+      const engine = Engine.create({ gravity: { x: 0, y: 1, scale: 0.001 } });
+      const world = engine.world;
+
+      const runner = Runner.create();
+      Runner.run(runner, engine);
+
+      // --- Static boundaries ---
+      const bounds = createBounds(width, height);
+      World.add(world, bounds);
+
+      // --- Three circular bodies (radius 36) matching 72px DOM ---
+      const r = 36;
+      const opts = { restitution: 0.6, friction: 0.08, frictionAir: 0.01, density: 0.001 };
+
+      const bodies = [
+        Bodies.circle(width * 0.25, height * 0.25, r, opts),
+        Bodies.circle(width * 0.5, height * 0.2, r, opts),
+        Bodies.circle(width * 0.72, height * 0.28, r, opts),
+      ];
+      World.add(world, bodies);
+
+      const ripples = [];
+      const attractorT0 = performance.now();
+      const MAX_OBJS = 16;
+      const chipPrototypes = els.slice(0, 3);
+
+      function spawnAt(px, py) {
+        if (bodies.length >= MAX_OBJS) return false;
+        const bw = scene.clientWidth;
+        const bh = scene.clientHeight;
+        if (bw < 32 || bh < 32) return false;
+        const pad = r + 6;
+        const x = Math.min(Math.max(px, pad), bw - pad);
+        const y = Math.min(Math.max(py, pad), bh - pad);
+        if (Query.point(bodies, { x, y }).length > 0) return false;
+        const variant = bodies.length % 3;
+        const clone = chipPrototypes[variant].cloneNode(true);
+        clone.style.transform =
+          'translate(' + (x - r) + 'px,' + (y - r) + 'px) rotate(0rad)';
+        scene.appendChild(clone);
+        const body = Bodies.circle(x, y, r, opts);
+        World.add(world, body);
+        bodies.push(body);
+        els.push(clone);
+        Body.setVelocity(body, {
+          x: (Math.random() - 0.5) * 0.35,
+          y: (Math.random() - 0.5) * 0.35,
+        });
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);
+        if (ripples.length > 14) ripples.shift();
+        ripples.push({ x, y, born: performance.now(), scale: 0.72 });
+        return true;
+      }
+
+      let pointerDownHit = false;
+      let lastSpawnAt = 0;
+
+      function isChip(b) {
+        return bodies.indexOf(b) >= 0;
+      }
+
+      function pointerInScene(clientX, clientY) {
+        const rect = scene.getBoundingClientRect();
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      }
+
+      // --- MouseConstraint: mouse on scene (canvas stays pointer-events: none) ---
+      const mouse = Mouse.create(scene);
+
+      /** Relative to element: offset must stay 0 (see HeroPhysicsScene.astro). */
+      function syncMouse() {
+        mouse.offset.x = 0;
+        mouse.offset.y = 0;
+        mouse.scale.x = 1;
+        mouse.scale.y = 1;
+      }
+      syncMouse();
+
+      const mouseConstraint = MouseConstraint.create(engine, {
+        mouse,
+        constraint: {
+          stiffness: 0.25,
+          damping: 0.08,
+          render: { visible: false },
+        },
+      });
+      World.add(world, mouseConstraint);
+      mouseConstraint.constraint.render.visible = false;
+
+      function syncPointerDownHit(clientX, clientY) {
+        const pt = pointerInScene(clientX, clientY);
+        pointerDownHit = Query.point(bodies, pt).length > 0;
+      }
+
+      scene.addEventListener(
+        'mousedown',
+        (e) => {
+          if (e.button !== 0) return;
+          syncPointerDownHit(e.clientX, e.clientY);
+        },
+        { passive: true }
+      );
+      scene.addEventListener(
+        'touchstart',
+        (e) => {
+          const t = e.changedTouches && e.changedTouches[0];
+          if (!t) return;
+          syncPointerDownHit(t.clientX, t.clientY);
+        },
+        { passive: true }
+      );
+      scene.addEventListener(
+        'click',
+        (e) => {
+          if (pointerDownHit) return;
+          const now = performance.now();
+          if (now - lastSpawnAt < 220) return;
+          const pt = pointerInScene(e.clientX, e.clientY);
+          if (Query.point(bodies, pt).length > 0) return;
+          if (spawnAt(pt.x, pt.y)) lastSpawnAt = now;
+        },
+        { passive: true }
+      );
+
+      function releaseMouseGlobal() {
+        mouse.button = -1;
+      }
+      window.addEventListener('mouseup', releaseMouseGlobal, { passive: true });
+      window.addEventListener('touchend', releaseMouseGlobal, { passive: true });
+
+      Events.on(engine, 'beforeUpdate', () => {
+        const w = scene.clientWidth;
+        const h = scene.clientHeight;
+        const t = (performance.now() - attractorT0) / 1000;
+        const ax = w * (0.5 + 0.1 * Math.sin(t * 0.32));
+        const ay = h * (0.45 + 0.08 * Math.cos(t * 0.26));
+        const pulse = 0.55 + 0.45 * Math.sin(t * 0.65);
+        for (let bi = 0; bi < bodies.length; bi++) {
+          const b = bodies[bi];
+          const dx = ax - b.position.x;
+          const dy = ay - b.position.y;
+          Body.applyForce(b, b.position, {
+            x: dx * 1e-5 * pulse,
+            y: dy * 1e-5 * pulse,
+          });
+        }
+        const pair = 4e-6;
+        for (let i = 0; i < bodies.length; i++) {
+          for (let j = i + 1; j < bodies.length; j++) {
+            const a = bodies[i];
+            const b = bodies[j];
+            const dx = b.position.x - a.position.x;
+            const dy = b.position.y - a.position.y;
+            const d = Math.hypot(dx, dy) + 24;
+            const fx = (dx / d) * pair;
+            const fy = (dy / d) * pair;
+            Body.applyForce(a, a.position, { x: fx, y: fy });
+            Body.applyForce(b, b.position, { x: -fx, y: -fy });
+          }
+        }
+      });
+
+      Events.on(engine, 'collisionStart', (ev) => {
+        const pairs = ev.pairs || [];
+        for (let pi = 0; pi < pairs.length; pi++) {
+          const pair = pairs[pi];
+          const a = pair.bodyA;
+          const b = pair.bodyB;
+          if (!isChip(a) && !isChip(b)) continue;
+          let scale = 0.5;
+          if (isChip(a) && isChip(b)) scale = 1;
+          const col = pair.collision;
+          let x = (a.position.x + b.position.x) / 2;
+          let y = (a.position.y + b.position.y) / 2;
+          if (col && col.supports && col.supports.length) {
+            const s0 = col.supports[0];
+            x = s0.x;
+            y = s0.y;
+          }
+          if (ripples.length > 14) ripples.shift();
+          ripples.push({ x, y, born: performance.now(), scale });
+        }
+      });
+
+      scene.addEventListener(
+        'mousemove',
+        (e) => {
+          const pt = pointerInScene(e.clientX, e.clientY);
+          const found = Query.point(bodies, pt);
+          for (let i = 0; i < els.length; i++) {
+            const on = found.length && bodies.indexOf(found[0]) === i;
+            els[i].style.opacity = mouseConstraint.body ? '1' : on ? '0.95' : '1';
+            els[i].style.filter = on && !mouseConstraint.body ? 'drop-shadow(0 0 10px rgba(56,189,248,0.5))' : '';
+          }
+        },
+        { passive: true }
+      );
+
+      scene.addEventListener(
+        'mouseleave',
+        () => {
+          for (let i = 0; i < els.length; i++) {
+            els[i].style.filter = '';
+          }
+        },
+        { passive: true }
+      );
+
+      scene.addEventListener(
+        'dblclick',
+        (e) => {
+          const pt = pointerInScene(e.clientX, e.clientY);
+          const found = Query.point(bodies, pt);
+          if (!found.length) return;
+          const b = found[0];
+          const dx = b.position.x - pt.x;
+          const dy = b.position.y - pt.y;
+          const len = Math.hypot(dx, dy) || 1;
+          const push = 0.00045;
+          Body.applyForce(b, b.position, { x: (dx / len) * push, y: (dy / len) * push });
+          Body.setAngularVelocity(b, b.angularVelocity + (Math.random() - 0.5) * 0.1);
+        },
+        { passive: true }
+      );
+
+      const ctx = canvas.getContext('2d');
+
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        syncMouse();
+      });
+
+      // --- DOM sync: Runner steps physics; rAF updates transforms ---
+      function loop() {
+        const cw = scene.clientWidth;
+        const ch = scene.clientHeight;
+        const now = performance.now();
+        if (ctx && cw > 0 && ch > 0) {
+          ctx.clearRect(0, 0, cw, ch);
+          for (let ri = ripples.length - 1; ri >= 0; ri--) {
+            const r0 = ripples[ri];
+            const age = now - r0.born;
+            const life = 380;
+            if (age > life) {
+              ripples.splice(ri, 1);
+              continue;
+            }
+            const u = age / life;
+            const rad = (6 + u * 56) * r0.scale;
+            ctx.strokeStyle = 'rgba(125, 211, 252, ' + 0.5 * (1 - u) + ')';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(r0.x, r0.y, rad, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+        for (let i = 0; i < bodies.length; i++) {
+          const b = bodies[i];
+          const el = els[i];
+          el.style.transform =
+            'translate(' + (b.position.x - r) + 'px,' + (b.position.y - r) + 'px) rotate(' + b.angle + 'rad)';
+        }
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

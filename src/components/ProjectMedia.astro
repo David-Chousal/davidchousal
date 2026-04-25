@@ -1,0 +1,81 @@
+---
+interface Video {
+  url: string;
+  title: string;
+}
+
+interface Props {
+  videos?: Video[];
+}
+
+const { videos } = Astro.props;
+
+const isYouTubeUrl = (url: string): boolean => {
+  return url.includes('youtube.com') || url.includes('youtu.be');
+};
+
+const isGifUrl = (url: string): boolean => {
+  return url.toLowerCase().endsWith('.gif');
+};
+
+const isVideoUrl = (url: string): boolean => {
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov'];
+  return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
+};
+
+const getYouTubeEmbedId = (url: string): string => {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&/?\s]+)/);
+  return match ? match[1] : '';
+};
+
+const getEmbedUrl = (url: string): string => {
+  const videoId = getYouTubeEmbedId(url);
+  return `https://www.youtube.com/embed/${videoId}`;
+};
+---
+
+{
+  videos && videos.length > 0 && (
+    <section class="py-8">
+      <h2 class="text-2xl font-semibold mb-6">Demo Videos</h2>
+      <div class="space-y-6">
+        {videos.map((video) => (
+          <div class="rounded-lg overflow-hidden bg-gray-900">
+            <h3 class="text-lg font-medium p-4 text-white">{video.title}</h3>
+            {isYouTubeUrl(video.url) && (
+              <div class="aspect-video">
+                <iframe
+                  src={getEmbedUrl(video.url)}
+                  title={video.title}
+                  class="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            )}
+            {isGifUrl(video.url) && (
+              <div class="aspect-video bg-black flex items-center justify-center">
+                <img
+                  src={video.url}
+                  alt={video.title}
+                  class="w-full h-full object-contain"
+                  loading="lazy"
+                />
+              </div>
+            )}
+            {isVideoUrl(video.url) && (
+              <div class="aspect-video">
+                <video
+                  src={video.url}
+                  title={video.title}
+                  controls
+                  class="w-full h-full bg-black"
+                />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}

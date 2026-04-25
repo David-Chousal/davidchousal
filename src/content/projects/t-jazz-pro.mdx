@@ -1,0 +1,348 @@
+---
+caseStudy: true
+title: "T-Jazz Pro"
+description: "An iOS app for jazz musicians to record practice sessions and automatically transcribe played notes, with iReal Pro integration and swing quantization."
+longDescription: "T-Jazz Pro (TranscribeJazz Pro) is a practice companion for jazz musicians: record takes aligned to the chart, run an MVP transcription pipeline with swing-aware quantization and rhythm cleanup, and review or edit before saving sessions and assets under Application Support. iReal Pro opens the standards path; import covers MusicXML, MIDI, and audio with security-scoped file access."
+tags: ["Swift", "iOS", "CoreData"]
+thumbnail: "/images/t-jazz/t-jazz-homepage.png"
+landingHomepageHeroVideo: "/images/t-jazz/t-jazz-demo.mov"
+landingVideoPoster: "/images/t-jazz/t-jazz-homepage.png"
+landingMediaProminence: large
+landingHoverPillBgUrl: "/images/t-jazz/t-jazz-homepage.png"
+landingFrameHoverBg: "/images/pill-hover-texture-reference2.png"
+landingHoverChrome:
+  topRight: none
+  bottomRight: scraps+code
+role: "Creator & Full-Stack Developer"
+technologies:
+  [
+    "Swift",
+    "SwiftUI",
+    "Core Data",
+    "AVFoundation",
+    "MusicXML",
+    "MIDI",
+    "iReal Pro",
+    "URL schemes",
+    "Security-scoped bookmarks",
+  ]
+link: "https://github.com/David-Chousal/T-Jazz-Pro"
+year: 2025
+duration: "Iterative personal project"
+skills: ["Audio capture", "Music information retrieval", "Practice UX"]
+team: ["David Chousal"]
+tools: "Xcode, GarageBand (reference audio), Figma"
+note: "Screen captures and recordings are from the Xcode simulator. Use the hero carousel at the top for mute-looped motion demos (session flow, tuner)."
+seoDescription: "T-Jazz Pro: iOS jazz practice companion with recording, bar alignment, transcription review, iReal Pro integration, MusicXML/MIDI/audio import — open source on GitHub."
+relatedLinks:
+  - href: "https://github.com/David-Chousal/T-Jazz-Pro"
+    label: "Repository — T-Jazz Pro"
+    kind: "public"
+  - href: "https://github.com/David-Chousal/T-Jazz-Pro/blob/main/README.md"
+    label: "README — structure and features"
+    kind: "public"
+  - href: "https://github.com/David-Chousal/T-Jazz-Pro/blob/main/SETUP.md"
+    label: "SETUP.md — Xcode and plist"
+    kind: "public"
+heroVideos:
+  - url: "/images/t-jazz/t-jazz-demo.mov"
+    title: "Session & practice"
+  - url: "/images/t-jazz/t-jazz-tuner-demo.mov"
+    title: "Tuner"
+toc:
+  - id: overview
+    label: Overview
+  - id: architecture
+    label: Architecture
+  - id: features
+    label: Features
+  - id: import
+    label: Import
+  - id: roadmap
+    label: Roadmap
+  - id: setup
+    label: Setup
+---
+
+import CaseStudySection from "../../components/portfolio/CaseStudySection.astro";
+import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
+
+<CaseStudySection id="overview" kicker="T-Jazz Pro — practice companion">
+
+<p class="font-case-mono text-[10px] uppercase text-case-ink/50 md:text-xs">Intent</p>
+
+<h1>Close the loop between ears, fingers, and notation</h1>
+
+<p>
+  The app targets the awkward middle ground after you solo on a tune: you have audio, but not yet a
+  structured record of what you played. The flow is deliberately practice-shaped: open or start a session,
+  use <strong>Mark Bar 1</strong> to align the take with the chart, record with guardrails against
+  feedback, then review transcription output before saving. Session files live under Application Support
+  (<code>Application Support/TranscribeJazz/Sessions/&lt;session-id&gt;/</code>), not ephemeral temp
+  storage.
+</p>
+
+<p>
+  iReal Pro is the bridge to real-book changes and search; the codebase also routes MusicXML, MIDI, and
+  audio through an import path built for sandboxed, security-scoped URLs.
+</p>
+
+<figure class="not-prose my-8 w-[min(220px,78vw)] shrink-0 rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(260px,70vw)]">
+  <img
+    src="/images/t-jazz/t-jazz-homepage.png"
+    alt="T-Jazz Pro library and session list in the simulator"
+    width="1206"
+    height="2622"
+    class="mx-auto block w-full rounded-md"
+    loading="lazy"
+  />
+  <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+    Library — sessions, charts, and entry into practice
+  </figcaption>
+</figure>
+
+</CaseStudySection>
+
+<CaseStudySection id="architecture" kicker="Architecture">
+
+<h2>Layered modules, one product story</h2>
+
+<p>
+  The repository mirrors a small clean-ish slice: domain models stay free of Apple frameworks; Apple-bound
+  work sits in persistence, services, and SwiftUI features.
+</p>
+
+<ul>
+  <li>
+    <strong>App</strong> — Entry (<code>TranscribeJazzApp</code>), app delegate hooks, root navigation.
+  </li>
+  <li>
+    <strong>Domain</strong> — Pure models: sessions, transcriptions, charts, audio assets, shared enums.
+  </li>
+  <li>
+    <strong>Persistence</strong> — Core Data stack, entities, repository, and file-backed session store.
+  </li>
+  <li>
+    <strong>Services</strong> — iReal linker, import coordinator, UTType helpers, audio session management,
+    recorder and player engines, onset/pitch pipeline, swing quantizer, tab mapper, transcription store.
+  </li>
+  <li>
+    <strong>Features</strong> — SwiftUI surfaces: Library, New Session, Practice Mode, Review/Edit, Import
+    Center.
+  </li>
+  <li>
+    <strong>Utilities</strong> — Errors, logging, formatters, app constants.
+  </li>
+</ul>
+
+<pre class="not-prose mt-4 overflow-x-auto rounded-lg border border-case-ink/10 bg-case-ink/[0.03] p-4 font-case-mono text-[11px] leading-relaxed text-case-ink/80 md:text-xs">
+Domain  &lt;--models--  Persistence / Services
+              |
+         Features (SwiftUI)
+</pre>
+
+<figure class="not-prose my-8 w-[min(220px,78vw)] rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(260px,70vw)]">
+  <img
+    src="/images/t-jazz/t-jazz-homepage-2.png"
+    alt="T-Jazz Pro navigation and layered SwiftUI surfaces"
+    width="1206"
+    height="2622"
+    class="mx-auto block w-full rounded-md"
+    loading="lazy"
+  />
+  <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+    How the app shell maps to the feature modules above
+  </figcaption>
+</figure>
+
+</CaseStudySection>
+
+<CaseStudySection id="features" kicker="Features and highlights">
+
+<h2>What the app demonstrates today</h2>
+
+<h3 class="!mt-8 !mb-3 text-base font-semibold text-case-ink">Practice mode</h3>
+
+<ul>
+  <li>
+    <strong>Speaker guard</strong> — Recording is blocked when output is the built-in speaker, reducing
+    mic feedback on kitchen-table practice.
+  </li>
+  <li>
+    <strong>Durable paths</strong> — Audio is written to Application Support, not <code>/tmp</code>.
+  </li>
+  <li>
+    <strong>Mark Bar 1</strong> — Explicit control to align the first bar of the take with the chart.
+  </li>
+  <li>
+    <strong>Input metering</strong> — Real-time level feedback while recording.
+  </li>
+</ul>
+
+<figure class="not-prose my-8 w-[min(220px,82vw)] rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(260px,72%)]">
+  <video
+    class="mx-auto block w-full rounded-md"
+    controls
+    playsinline
+    preload="metadata"
+    poster="/images/t-jazz/t-jazz-tuner-demo.png"
+    src="/images/t-jazz/t-jazz-tuner-demo.mov"
+  />
+  <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+    Practice — tuner and metering in the session surface
+  </figcaption>
+</figure>
+
+<h3 class="!mt-8 !mb-3 text-base font-semibold text-case-ink">Transcription and review</h3>
+
+<ul>
+  <li>
+    <strong>MVP DSP pipeline</strong> — Onset/pitch path exists as a scaffold; the upstream README is
+    explicit that <em>production-grade</em> pitch and onset detection is still the work to do.
+  </li>
+  <li>
+    <strong>Swing quantization</strong> — Configurable swing amount so engraved rhythm stays readable.
+  </li>
+  <li>
+    <strong>Rhythm simplification</strong> — Post-pass to clean up busy notation.
+  </li>
+  <li>
+    <strong>Tab mapping</strong> — Bridges detected pitch to fretboard positions where applicable.
+  </li>
+  <li>
+    <strong>Review affordances</strong> — Adjust swing amount and simplify rhythm in the review surface.
+  </li>
+  <li>
+    <strong>Persistence</strong> — Save sessions and bundled files; Core Data model is set up for
+    lightweight migration.
+  </li>
+</ul>
+
+<div class="not-prose my-8 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+  <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)]">
+    <img
+      src="/images/t-jazz/t-jazz-tuner-demo.png"
+      alt="T-Jazz Pro tuner and practice tools"
+      width="1206"
+      height="2622"
+      class="mx-auto block max-h-[min(340px,46vh)] w-auto rounded-md object-contain object-top"
+      loading="lazy"
+    />
+    <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+      <strong>Practice tools</strong> — tuner still (clip above shows motion)
+    </figcaption>
+  </figure>
+  <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)]">
+    <img
+      src="/images/t-jazz/t-jazz-settings-demo.png"
+      alt="T-Jazz Pro settings and app preferences"
+      width="1206"
+      height="2622"
+      class="mx-auto block max-h-[min(340px,46vh)] w-auto rounded-md object-contain object-top"
+      loading="lazy"
+    />
+    <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+      <strong>Settings</strong> — prefs that sit next to permissions and iReal discovery
+    </figcaption>
+  </figure>
+  <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)] sm:col-span-2 lg:col-span-1">
+    <img
+      src="/images/t-jazz-pro.png"
+      alt="T-Jazz Pro transcription and review UI"
+      width="800"
+      height="600"
+      class="mx-auto block max-h-[min(340px,46vh)] w-auto rounded-md object-contain object-top"
+      loading="lazy"
+    />
+    <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+      <strong>Review</strong> — notation surface for swing and rhythm cleanup
+    </figcaption>
+  </figure>
+</div>
+
+<ChallengeBlock>
+  When the detector is still a placeholder, how do you ship a credible practice shell without overstating
+  accuracy?
+</ChallengeBlock>
+
+</CaseStudySection>
+
+<CaseStudySection id="import" kicker="Import and integrations">
+
+<h2>Charts, files, and iReal handoff</h2>
+
+<ul>
+  <li>
+    <strong>File formats</strong> — MusicXML, MIDI, and audio imports share coordinator and type
+    plumbing.
+  </li>
+  <li>
+    <strong>iReal Pro</strong> — Deep links and queries use <code>irealb</code> and <code>irealbook</code>
+    URL schemes so the app can sit next to the catalog players already use.
+  </li>
+  <li>
+    <strong>Sandbox-friendly imports</strong> — Security-scoped URL handling for user-picked files.
+  </li>
+</ul>
+
+<p>
+  Info.plist expectations include microphone usage copy and <code>LSApplicationQueriesSchemes</code> for
+  those schemes — details live in the repo’s setup notes.
+</p>
+
+<figure class="not-prose my-8 w-[min(200px,72vw)] rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(240px,55%)]">
+  <img
+    src="/images/t-jazz/t-jazz-new-session-preview.png"
+    alt="T-Jazz Pro new session with chart before recording or import"
+    width="1206"
+    height="2622"
+    class="mx-auto block w-full rounded-md"
+    loading="lazy"
+  />
+  <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+    Chart-backed session — the surface that meets MusicXML, MIDI, audio, and iReal routes
+  </figcaption>
+</figure>
+
+</CaseStudySection>
+
+<CaseStudySection id="roadmap" kicker="Roadmap">
+
+<h2>Phased delivery (from the repo README)</h2>
+
+<ul>
+  <li>
+    <strong>Phase 1 — Functional MVP</strong> — Library and new session flows; open iReal search; practice
+    recording with Mark Bar 1; basic per-measure transcription list; review for rhythm simplification and
+    swing; save sessions and files.
+  </li>
+  <li>
+    <strong>Phase 2 — Import power</strong> — MusicXML plus audio import; form and measure numbers from
+    MusicXML; backing-track playback.
+  </li>
+  <li>
+    <strong>Phase 3 — Polish</strong> — Stronger notation/tab rendering; faster editing (e.g. drag note
+    timing, quick ties); export formats.
+  </li>
+</ul>
+
+</CaseStudySection>
+
+<CaseStudySection id="setup" kicker="Setup">
+
+<h2>Building and extending</h2>
+
+<p>
+  The Xcode target may still use a legacy app entry (<code>T_Jazz_ProApp.swift</code>); the README
+  describes either swapping in <code>TranscribeJazzApp.swift</code> or wiring the new root view from the
+  existing entry. New source folders need to be added to the target; <code>CoreDataModels.xcdatamodeld</code> must be included in the build.
+</p>
+
+<p>
+  For permissions and iReal discovery, add <code>NSMicrophoneUsageDescription</code> and
+  <code>LSApplicationQueriesSchemes</code> entries (<code>irealb</code>, <code>irealbook</code>) via
+  generated Info.plist settings or the bundled <code>Resources/Info.plist</code> as documented in
+  <strong>SETUP.md</strong> on GitHub.
+</p>
+
+</CaseStudySection>

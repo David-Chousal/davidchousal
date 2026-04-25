@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Interactive SVG Toast</title>
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet' type='text/css'><link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <svg  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 600 600">
+<defs>
+<clipPath id="helloLinesMask">
+	<circle class="helloLinesMask" fill="#FF0000" cx="301.2" cy="321" r="159.8"/>
+</clipPath>   
+</defs>
+<circle class="circleBg" fill="#FEFDF9" cx="300" cy="300" r="0"/>
+ <g class="maskedHelloLines" clip-path="url(#helloLinesMask)" >
+<g class="helloLinesGroup" stroke="#FFA631" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10">
+	
+		<line fill="none"  x1="408.4" y1="211.8" x2="386.5" y2="233.7"/>
+	
+		<line fill="none"  x1="213.9" y1="406.3" x2="192" y2="428.2"/>
+	
+		<line fill="none"  x1="408.4" y1="428.2" x2="387.5" y2="407.3"/>
+	
+		<line fill="none"  x1="214.9" y1="234.7" x2="192" y2="211.8"/>
+	
+		<line fill="none"  x1="179" y1="321" x2="147" y2="321"/>
+	
+		<line fill="none"  x1="453" y1="321" x2="423" y2="321"/>
+</g>
+  </g>  
+  <g class="wholeToaster">
+<ellipse class="shadow" fill="#F6ECE2" cx="297.3" cy="377.9" rx="115" ry="8.9"/>
+<path class="bread" fill="#DDB494" stroke="#CBA276" stroke-width="8" stroke-miterlimit="10" d="M259.7,356
+	c-7.9,0-5.1-12.1-5.1-12.1s3.7-51,4.2-57.2c0.5-6.2-6.1-2.6-6.9-11.9c1.1-28.8,43.6-27.5,43.6-27.5s43-1.4,44.1,27.4
+	c-0.8,9.3-7.3,5.6-6.9,11.8c0.5,6.2,4.2,57.4,4.2,57.4s2.8,12.1-5.1,12.1H259.7z"/>
+<path class="footL" fill="#838383" d="M242.8,379.9H222c-0.7,0-1.2-0.6-1.2-1.2v-8.4c0-0.7,0.6-1.2,1.2-1.2h20.7
+	c0.7,0,1.2,0.6,1.2,1.2v8.4C244,379.3,243.4,379.9,242.8,379.9z"/>
+<path class="footR" fill="#838383" d="M368.3,379.9h-20.7c-0.7,0-1.2-0.6-1.2-1.2v-8.4c0-0.7,0.6-1.2,1.2-1.2h20.7
+	c0.7,0,1.2,0.6,1.2,1.2v8.4C369.6,379.3,369,379.9,368.3,379.9z"/>
+<path class="handle" fill="#838383" d="M396.6,311.8h-17.5c-1,0-1.8-0.8-1.8-1.8v-8.8c0-1,0.8-1.8,1.8-1.8h17.5c1,0,1.8,0.8,1.8,1.8
+	v8.8C398.5,311,397.6,311.8,396.6,311.8z"/>
+<path class="body" fill="#23B574" d="M207.2,376.2v-77.8c0-23.3,19.1-42.3,42.3-42.3h91.9c23.3,0,42.3,19.1,42.3,42.3v77.8H207.2z"
+	/>
+<path class="shine" fill="#39BC78" d="M372.7,269.8c-2.2-2.4-4.6-4.5-7.3-6.4c-4.4-3.5-11-7-21.7-7.4c-0.2,0-0.3,0-0.5,0
+	c-0.6,0-1.1,0-1.7,0h-91.9c-23.3,0-42.3,19.1-42.3,42.3v77.8L372.7,269.8L372.7,269.8z"/>
+<g class="dialGroup">
+	<circle fill="#8CC63E" stroke="#FFFFFF" stroke-width="4.9819" stroke-miterlimit="10" cx="345.9" cy="345.6" r="16.2"/>
+	<path class="ticker" fill="#076B37" d="M333.8,345.6c0-0.6,3-1.7,6.7-2.6c3.7-0.8,6.7,0.3,6.7,2.6c0,2.3-3,3.4-6.7,2.6
+		C336.8,347.3,333.8,346.2,333.8,345.6z"/>
+	<g class="unitsGroup" fill="#FFFFFF">
+		<circle  cx="367.8" cy="336.7" r="1.9"/>
+		<circle  cx="321.7" cy="346.7" r="1.9"/>
+		<circle  cx="325.5" cy="333" r="1.9"/>
+		<circle  cx="335.4" cy="324.3" r="1.9"/>
+		<circle  cx="349.1" cy="321.8" r="1.9"/>
+		<circle  cx="361.6" cy="326.8" r="1.9"/>
+	</g>
+</g>
+<g class="specular">
+	<path fill="#62DB96" d="M226.5,276.6c5.3-5,12.9-9.3,16.3-8.2c3.4,1.1,2.2,9.9-3.1,18.4c-5.3,8.5-12.9,10.6-16.3,6.1
+		C220,288.4,221.2,281.7,226.5,276.6z"/>
+</g>
+<circle class="lightGlow" fill="none" stroke="#F04302" cx="300.3" cy="355.3" r="0"/>
+<circle class="light" fill="#7f7f7f" cx="300.3" cy="355.3" r="3.1"/>
+  
+  </g>  
+<g class="heatLinesGroup" stroke="#FF8457" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10">
+	<path fill="none"   d="M267,152
+		c0,7.6-10,7.6-10,15.2c0,7.6,10,7.6,10,15.2c0,7.6-10,7.6-10,15.2c0,7.6,10,7.6,10,15.2s-10,7.6-10,15.2"/>
+	<path fill="none"  d="M302,152
+		c0,7.6-10,7.6-10,15.2c0,7.6,10,7.6,10,15.2c0,7.6-10,7.6-10,15.2c0,7.6,10,7.6,10,15.2s-10,7.6-10,15.2"/>  
+	<path fill="none"  d="M337,152
+		c0,7.6-10,7.6-10,15.2c0,7.6,10,7.6,10,15.2c0,7.6-10,7.6-10,15.2c0,7.6,10,7.6,10,15.2s-10,7.6-10,15.2"/>
+
+</g>  
+<polygon class="arrow" fill="#838383" points="461.6,301.9 461.6,313.8 467.9,313.8 455.9,327.3 443.9,313.8 450.1,313.8 
+	450.1,301.9 "/> 
+  <text class="pull"><tspan dx="435" dy="270">DRAG</tspan><tspan dx="-55" dy="20">HANDLE!</tspan></text>  
+</svg>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js'></script>
+<script src='//s3-us-west-2.amazonaws.com/s.cdpn.io/16327/DrawSVGPlugin.js?r=12'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/utils/Draggable.min.js'></script>
+<script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/ThrowPropsPlugin.min.js'></script><script  src="./script.js"></script>
+
+  </body>
+  
+</html>

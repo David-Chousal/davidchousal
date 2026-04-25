@@ -1,0 +1,82 @@
+---
+interface Related {
+  href: string;
+  label: string;
+  kind?: "public" | "article";
+}
+
+interface Props {
+  liveUrl?: string;
+  relatedLinks?: Related[];
+  fallbackUrl?: string;
+  fallbackLabel?: string;
+}
+
+const { liveUrl, relatedLinks, fallbackUrl, fallbackLabel = "Repository" } = Astro.props;
+
+const primaryHref = liveUrl ?? fallbackUrl;
+
+let primaryTitle = fallbackLabel;
+let liveSubtitle: string | undefined;
+if (liveUrl) {
+  liveSubtitle = "Open the live product";
+  try {
+    primaryTitle = new URL(liveUrl).hostname.replace(/^www\./, "");
+  } catch {
+    primaryTitle = "Live site";
+  }
+}
+---
+
+{
+  (primaryHref || (relatedLinks && relatedLinks.length > 0)) && (
+    <div class="space-y-4">
+      {primaryHref && (
+        <a
+          href={primaryHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group block w-full rounded-xl border border-case-ink/10 bg-case-ink/[0.03] p-6 transition-all duration-300 hover:border-case-ink/20 hover:bg-case-ink/[0.06] md:p-8"
+        >
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="space-y-2">
+              <p class="font-case-mono text-[10px] uppercase tracking-wider text-case-ink/50 md:text-xs">
+                {liveUrl ? "Live" : "Code"}
+              </p>
+              <h3 class="font-case-sans text-2xl font-medium text-case-ink md:text-3xl">{primaryTitle}</h3>
+              {liveSubtitle && <p class="font-case-sans text-sm text-case-ink/60 md:text-base">{liveSubtitle}</p>}
+            </div>
+            <div class="flex items-center gap-2 text-case-ink/60 transition-colors group-hover:text-case-ink">
+              <span class="font-case-sans hidden text-sm md:inline">Open</span>
+              <svg width="20" height="20" viewBox="0 0 12 12" fill="none" class="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true">
+                <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
+        </a>
+      )}
+      {relatedLinks && relatedLinks.length > 0 && (
+        <div class="grid gap-3 md:grid-cols-2">
+          {relatedLinks.map((r) => (
+            <a
+              href={r.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group flex items-center justify-between rounded-lg border border-case-ink/[0.08] p-4 transition-all duration-300 hover:border-case-ink/15"
+            >
+              <div class="min-w-0 space-y-1">
+                <p class="font-case-mono text-[10px] uppercase text-case-ink/40">
+                  {r.kind === "article" ? "Article" : r.kind === "public" ? "Public" : "Link"}
+                </p>
+                <p class="font-case-sans text-sm text-case-ink/70 transition-colors group-hover:text-case-ink/90">{r.label}</p>
+              </div>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="ml-3 shrink-0 text-case-ink/25 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-case-ink/50" aria-hidden="true">
+                <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

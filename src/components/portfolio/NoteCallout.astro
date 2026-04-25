@@ -1,0 +1,14 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "Note" } = Astro.props;
+---
+
+<div class="border-l border-case-ink/20 py-1 pl-3 md:pl-4 space-y-1.5 md:space-y-2">
+  <h3 class="font-case-mono text-[10px] uppercase text-case-ink/50 md:text-xs">{title}</h3>
+  <div class="font-case-sans text-sm leading-relaxed text-case-ink/60 md:text-base">
+    <slot />
+  </div>
+</div>

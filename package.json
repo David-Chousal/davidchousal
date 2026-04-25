@@ -1,0 +1,25 @@
+{
+  "name": "hilarious-houston",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "sync-hero-embeds": "node scripts/sync-hero-embeds.mjs",
+    "predev": "npm run sync-hero-embeds",
+    "prebuild": "npm run sync-hero-embeds",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^5.0.4",
+    "@rive-app/canvas": "^2.37.4",
+    "@tailwindcss/vite": "^4.2.4",
+    "astro": "^6.1.9",
+    "matter-js": "^0.20.0",
+    "tailwindcss": "^4.2.4"
+  }
+}

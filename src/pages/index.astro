@@ -1,0 +1,136 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import HeroIllustrationCarousel from "../components/HeroIllustrationCarousel.astro";
+
+/** Featured first (grid order), then the rest alphabetically by slug */
+const FRONT_RUNNER_IDS = ["kin-care", "t-jazz-pro"];
+
+const projects = [...(await getCollection("projects"))].sort((a, b) => {
+  const rank = (id: string) => {
+    const i = FRONT_RUNNER_IDS.indexOf(id);
+    return i === -1 ? FRONT_RUNNER_IDS.length : i;
+  };
+  const d = rank(a.id) - rank(b.id);
+  return d !== 0 ? d : a.id.localeCompare(b.id);
+});
+
+const videoUrlPattern = /\.(mp4|webm|mov)(\?|$)/i;
+function firstGridPreviewVideo(heroVideos: { url: string }[] | undefined) {
+  return heroVideos?.find((v) => videoUrlPattern.test(v.url))?.url;
+}
+
+function landingPreviewVideoUrl(data: {
+  landingHomepageHeroVideo?: string;
+  heroVideos?: { url: string }[];
+}) {
+  if (data.landingHomepageHeroVideo && videoUrlPattern.test(data.landingHomepageHeroVideo)) {
+    return data.landingHomepageHeroVideo;
+  }
+  return firstGridPreviewVideo(data.heroVideos);
+}
+
+const defaultLandingChrome = { topRight: "none" as const, bottomRight: "code" as const };
+---
+
+<Layout title="Work — David Chousal" siteTone="cream">
+  <div
+    slot="hero"
+    class="flex w-full flex-col items-center justify-center px-4 pb-8 pt-24 sm:pt-28"
+  >
+    <div class="flex min-h-[min(72dvh,760px)] w-full flex-1 flex-col items-center justify-center py-6">
+      <div
+        class="relative h-[45dvh] w-[88vw] max-h-[600px] max-w-[900px] sm:h-[min(65dvh,600px)] sm:w-[70vw]"
+      >
+        <div class="relative flex h-full min-h-0 w-full flex-col">
+          <HeroIllustrationCarousel variant="landing" />
+        </div>
+      </div>
+    </div>
+    <a
+      href="#projects-grid"
+      class="flex flex-col items-center pb-2 pt-2 text-[#2a2520]/45 transition-opacity hover:opacity-80"
+      aria-label="Scroll to projects"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12l7 7 7-7" />
+      </svg>
+    </a>
+  </div>
+
+  <section id="projects-grid" class="w-full scroll-mt-24 py-12">
+    <p class="font-pp-mori mb-6 text-center text-xs tracking-wide text-[#2a2520]/60">
+      PROJECTS
+    </p>
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {projects.map((project) => (
+        <ProjectCard
+          compact
+          variant="landing"
+          title={project.data.title}
+          description={project.data.description}
+          tags={project.data.tags}
+          thumbnail={project.data.thumbnail}
+          slug={project.id}
+          logo={project.data.logo}
+          previewVideoUrl={landingPreviewVideoUrl(project.data)}
+          landingVideoHero={Boolean(project.data.landingHomepageHeroVideo)}
+          videoPosterUrl={project.data.landingVideoPoster ?? project.data.thumbnail}
+          pillHoverBgUrl={project.data.landingHoverPillBgUrl}
+          landingFrameHoverBg={project.data.landingFrameHoverBg}
+          landingMediaProminence={project.data.landingMediaProminence ?? "default"}
+          landingHoverChrome={project.data.landingHoverChrome ?? defaultLandingChrome}
+        />
+      ))}
+    </div>
+    <div class="flex justify-center pb-8 pt-8">
+      <a
+        href="/extras"
+        class="font-pp-mori text-xs text-[#2a2520]/50 transition-colors hover:text-[#2a2520]/80"
+      >
+        SEE MORE WORK →
+      </a>
+    </div>
+    <div class="mx-auto w-full max-w-4xl px-4 pb-20 pt-2">
+      <div class="relative h-[min(52dvh,520px)] w-full min-h-[260px] max-h-[600px] sm:h-[min(48dvh,500px)]">
+        <div class="flex h-full min-h-0 w-full flex-col">
+          <HeroIllustrationCarousel variant="footer" />
+        </div>
+      </div>
+    </div>
+  </section>
+  <script is:inline>
+    (function () {
+      function bindVideoHeroCards() {
+        document.querySelectorAll("[data-video-hero-card]").forEach(function (card) {
+          if (card.dataset.vhBound === "1") return;
+          card.dataset.vhBound = "1";
+          var v = card.querySelector("video");
+          if (!v) return;
+          card.addEventListener("mouseenter", function () {
+            void v.play().catch(function () {});
+          });
+          card.addEventListener("mouseleave", function () {
+            v.pause();
+            try {
+              v.currentTime = 0;
+            } catch (e) {}
+          });
+        });
+      }
+      bindVideoHeroCards();
+      document.addEventListener("astro:page-load", bindVideoHeroCards);
+    })();
+  </script>
+</Layout>

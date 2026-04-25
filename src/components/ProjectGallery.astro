@@ -1,0 +1,33 @@
+---
+interface GalleryImage {
+  src: string;
+  alt: string;
+}
+
+interface Props {
+  images: GalleryImage[];
+  title?: string;
+}
+
+const { images, title } = Astro.props;
+---
+
+{
+  images && images.length > 0 && (
+    <section class="py-8">
+      {title && <h2 class="text-2xl font-semibold mb-6">{title}</h2>}
+      <div class="grid gap-4 md:columns-2 lg:columns-3 auto-rows-max">
+        {images.map((image) => (
+          <div class="break-inside-avoid overflow-hidden rounded-lg bg-gray-200">
+            <img
+              src={image.src}
+              alt={image.alt}
+              class="w-full h-auto object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}

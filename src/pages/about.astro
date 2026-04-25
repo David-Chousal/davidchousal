@@ -1,0 +1,147 @@
+---
+import Layout from "../layouts/Layout.astro";
+import AboutPhotoCarousel from "../components/AboutPhotoCarousel.astro";
+
+const aboutPortrait = {
+  src: "/images/about/about-carousel1.png",
+  alt: "Portrait",
+} as const;
+
+const aboutCarouselSlides = [
+  { src: "/images/about/about-carousel2.png", alt: "Snapshot 2" },
+  { src: "/images/about/about-carousel3.png", alt: "Snapshot 3" },
+] as const;
+---
+
+<Layout title="About — David Chousal" siteTone="cream">
+  <div class="mx-auto w-full max-w-2xl space-y-16 pt-20 sm:pt-24">
+    <section class="space-y-6">
+      <h1 class="font-pp-mori text-xs tracking-wide text-[#2a2520]/60">ABOUT</h1>
+      <!-- Figure first in DOM so sm+ float-right wraps following <p> blocks; flex order inverts on mobile -->
+      <div class="flex flex-col gap-6 sm:block sm:flow-root">
+        <figure
+          class="order-2 mx-auto w-full min-w-0 max-w-[270px] sm:order-none sm:float-right sm:mx-0 sm:mb-3 sm:ml-6 sm:mt-1 sm:w-[min(300px,42%)] sm:max-w-[300px]"
+        >
+          <div
+            class="max-w-full overflow-hidden rounded-sm ring-1 ring-black/[0.06] shadow-[0_14px_40px_-22px_rgba(42,37,32,0.14)]"
+          >
+            <div class="aspect-[3/4] w-full max-w-full bg-black/[0.03]">
+              <img
+                src={aboutPortrait.src}
+                alt={aboutPortrait.alt}
+                class="h-full w-full max-w-full object-contain"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+          </div>
+        </figure>
+        <p class="order-1 text-base leading-relaxed text-[#2a2520]/85 sm:order-none">
+          I'm a Computer Science and Engineering student at Santa Clara University, currently navigating the
+          intersection of technical systems and human-centric design.
+        </p>
+        <p class="order-1 text-base leading-relaxed text-[#2a2520]/85 sm:order-none sm:mt-6">
+          My approach to development is informed by the discipline of a jazz musician. In a combo, the
+          improvisation that looks effortless is actually the result of obsessively practicing the "head" of a
+          tune for hours until it's muscle memory. I bring that same ethos to my code—whether I'm working on
+          low-level systems in C++, crafting interfaces in Swift, or building across the stack in TypeScript.
+          I believe in perfecting the foundation so that when it's time to deploy or collaborate, I can move
+          with the mental agility I've gained from jam sessions with people I've only just met.
+        </p>
+        <p class="order-1 text-base leading-relaxed text-[#2a2520]/85 sm:order-none sm:mt-6">
+          I have always believed that if you can write, you can think. This mantra is the heartbeat of my
+          process; whether I'm drafting a piece of fiction or architecting an app, I treat every line as a
+          reflection of clarity. During my time at Cemex and Softtek, I learned that technical skill is only
+          half the battle, where the other half is translating complex data into a narrative that resonates with
+          people. I view my work as a quiet bridge, helping us evolve through technology without losing the human
+          moments that make us who we are.
+        </p>
+        <p class="order-1 text-base leading-relaxed text-[#2a2520]/85 sm:order-none sm:mt-6">
+          Outside of the terminal, I'm an explorer of both the mental and physical world. You can usually find
+          me playing jazz guitar, diving into a physics videos, writing fiction, or riding my dirt bike. These
+          "unplugged" moments are what keep me grounded; there is a visceral reality to a muddy trail that helps
+          me keep my digital work in perspective and ensures I never lose sight of the present.
+        </p>
+        <p class="order-1 text-base leading-relaxed text-[#2a2520]/85 sm:order-none sm:mt-6">
+          <em>My fuel of choice?</em> A strong, simple cafecito to kickstart a long practice session or a deep
+          dive into a puzzle.
+        </p>
+        <p class="order-1 text-base leading-relaxed text-[#2a2520]/85 sm:order-none sm:mt-6">
+          As an international student who has navigated the transition between cultures and the complexities of
+          starting a career in a new environment, I know how challenging it can be to find your footing. I'm
+          always happy to chat with fellow students or early-stage engineers navigating the US tech landscape.
+          Whether you want to talk about system architecture, the best way to isolate a pedal board power
+          supply, or just how to keep your seat on a mountain trail, feel free to reach out!
+        </p>
+      </div>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="font-pp-mori text-xs tracking-wide text-[#2a2520]/60">SKILLS</h2>
+      <div class="space-y-3">
+        <div>
+          <p class="mb-1.5 text-xs text-[#2a2520]/50">Languages</p>
+          <div class="flex flex-wrap gap-2">
+            {["C", "C++", "C#", "Swift", "SwiftUI", "JavaScript", "TypeScript", "Python", "Java", "MATLAB", "Assembly"].map((s) => (
+              <span class="rounded-full px-2 py-0.5 text-xs text-[#2a2520]/65 ring-1 ring-black/[0.06]">{s}</span>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p class="mb-1.5 text-xs text-[#2a2520]/50">Tools</p>
+          <div class="flex flex-wrap gap-2">
+            {["Xcode", "SQL", "DAX", "Power BI", "React Native", "Expo", "Supabase", "Node.js", "Arduino"].map((s) => (
+              <span class="rounded-full px-2 py-0.5 text-xs text-[#2a2520]/65 ring-1 ring-black/[0.06]">{s}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <AboutPhotoCarousel slides={[...aboutCarouselSlides]} />
+
+    <section class="space-y-4">
+      <h2 class="font-pp-mori text-xs tracking-wide text-[#2a2520]/60">RESUME</h2>
+      <a
+        href="/resume.pdf"
+        class="inline-flex items-center gap-2 border border-[#2a2520]/25 px-4 py-2 text-sm text-[#2a2520]/90 transition-colors duration-150 hover:bg-[#2a2520] hover:text-[#f5f1ec]"
+      >
+        Download Resume
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+      </a>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="font-pp-mori text-xs tracking-wide text-[#2a2520]/60">CONTACT</h2>
+      <ul class="space-y-2">
+        <li>
+          <a
+            href="https://www.linkedin.com/in/david-chousal-749010297/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm text-[#2a2520]/55 transition-colors hover:text-[#2a2520]/85"
+          >
+            LinkedIn ↗
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/David-Chousal"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm text-[#2a2520]/55 transition-colors hover:text-[#2a2520]/85"
+          >
+            GitHub ↗
+          </a>
+        </li>
+        <li>
+          <a href="mailto:davidchousal@icloud.com" class="text-sm text-[#2a2520]/55 transition-colors hover:text-[#2a2520]/85">
+            Email ↗
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</Layout>

@@ -1,0 +1,84 @@
+---
+interface TocItem {
+  id: string;
+  label: string;
+}
+
+interface Props {
+  projectTitle: string;
+  toc: TocItem[];
+}
+
+const { projectTitle, toc } = Astro.props;
+---
+
+<div
+  data-case-overlay
+  class="fixed inset-0 z-30 bg-case-ink/20 opacity-0 pointer-events-none transition-opacity duration-200 md:hidden"
+  aria-hidden="true"
+>
+</div>
+
+<nav
+  data-case-sidebar
+  class="fixed left-0 top-0 z-40 flex h-screen w-[min(100vw,240px)] max-w-[85vw] -translate-x-full flex-col border-r border-case-ink/[0.06] bg-case-canvas p-6 pt-20 shadow-2xl transition-transform duration-300 ease-out md:translate-x-0 md:shadow-none md:pt-8"
+  style="width: 240px;"
+  aria-label="Case study sections"
+>
+  <div class="shrink-0 border-b border-case-ink/[0.06] pb-4 md:border-0">
+    <div class="space-y-5 pt-2 md:pt-0">
+      <a
+        href="/"
+        class="group mb-1 flex items-center gap-2 font-case-mono text-xs text-case-ink/55 transition-colors duration-200 hover:text-case-ink/75"
+      >
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="text-case-ink/55 group-hover:text-case-ink/75" aria-hidden="true">
+          <path d="M7.5 2L3.5 6L7.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="uppercase tracking-wide">Back to projects</span>
+      </a>
+      <div>
+        <p class="font-case-mono mb-1 text-[10px] uppercase tracking-wide text-case-ink/30">Case study</p>
+        <p class="font-case-sans text-sm font-medium leading-tight text-case-ink/70">{projectTitle}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-1 -mx-1 pb-8 [scrollbar-width:none] md:px-0 md:mx-0 [&::-webkit-scrollbar]:hidden">
+    <div class="flex gap-4 items-start md:pb-[30vh]">
+      <div class="relative flex shrink-0 flex-col gap-8 pt-3" aria-hidden="true">
+        {
+          toc.map((item, i) => (
+            <div class="relative flex items-center">
+              {i < toc.length - 1 && (
+                <div class="absolute top-2 left-[3px] h-8 w-[1.5px] bg-case-ink/[0.08]" />
+              )}
+              <div
+                data-case-dot
+                data-case-dot-for={item.id}
+                data-on={i === 0 ? "true" : "false"}
+                class="case-study-dot relative z-10 h-[7px] w-[7px] shrink-0 rounded-full transition-all duration-300"
+              />
+            </div>
+          ))
+        }
+      </div>
+      <ul class="flex min-w-0 flex-1 flex-col gap-[7px]">
+        {
+          toc.map((item, i) => (
+            <li>
+              <button
+                type="button"
+                data-case-toc
+                data-case-toc-for={item.id}
+                data-active={i === 0 ? "true" : "false"}
+                class="case-study-toc w-full py-2 text-left font-case-mono text-xs text-case-ink/45 transition-all duration-200 hover:text-case-ink/65"
+              >
+                {item.label}
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,79 @@
+---
+import CaseStudySidebar from "./CaseStudySidebar.astro";
+
+interface TocItem {
+  id: string;
+  label: string;
+}
+
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  projectTitle: string;
+  toc: TocItem[];
+  bottomNav: NavItem[];
+  currentPath: string;
+}
+
+const { projectTitle, toc, bottomNav, currentPath } = Astro.props;
+---
+
+<div
+  data-case-study-root
+  class="case-study min-h-screen overflow-x-hidden bg-case-canvas font-case-sans text-case-ink antialiased"
+>
+  <div
+    class="fixed left-0 right-0 top-0 z-50 border-b border-case-ink/[0.06] bg-case-canvas/80 px-4 py-4 backdrop-blur-sm md:hidden"
+  >
+    <div class="flex items-center justify-between">
+      <a href="/" class="group">
+        <span class="font-case-sans text-sm font-medium tracking-tight text-case-ink/90">David Chousal</span>
+      </a>
+      <button
+        type="button"
+        data-case-menu-button
+        class="-m-3 flex h-11 w-11 items-center justify-center text-case-ink/55 transition-colors hover:text-case-ink/80"
+        aria-label="Open menu"
+        aria-expanded="false"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <CaseStudySidebar projectTitle={projectTitle} toc={toc} />
+
+  <main
+    data-case-main
+    class="h-screen overflow-y-auto [scrollbar-width:none] md:ml-[240px] [&::-webkit-scrollbar]:hidden"
+  >
+    <slot />
+    <div class="flex flex-wrap items-center justify-center gap-4 py-6 sm:gap-6 sm:py-10">
+      {
+        bottomNav.map(({ label, href }) => (
+          <a
+            href={href}
+            class:list={[
+              "font-case-mono text-[11px] uppercase tracking-wide transition-colors",
+              currentPath === href ? "text-case-ink/80" : "text-case-ink/35 hover:text-case-ink/65",
+            ]}
+          >
+            {label}
+          </a>
+        ))
+      }
+    </div>
+  </main>
+</div>
+
+<script>
+  import { initCaseStudyChrome } from "../../scripts/case-study-client";
+  initCaseStudyChrome();
+</script>

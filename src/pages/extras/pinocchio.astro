@@ -1,0 +1,40 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Pinocchio — Extras — David Chousal" siteTone="cream">
+  <div class="mx-auto w-full max-w-[min(900px,calc(100vw-2rem))] pt-20 sm:pt-24">
+    <header class="mb-8 text-center">
+      <h1 class="font-pp-mori text-sm tracking-wide text-[#2a2520]/70">
+        PINOCCHIO
+      </h1>
+      <p class="mt-3 text-sm leading-relaxed text-[#2a2520]/55">
+        Type a lie.
+      </p>
+    </header>
+
+    <div
+      class="relative mx-auto w-full overflow-hidden rounded-[1.25rem] shadow-[0_24px_60px_-28px_rgba(42,37,32,0.2)] ring-1 ring-black/[0.08] bg-[#C6EBF2]"
+      style="aspect-ratio: 900 / 560;"
+    >
+      <div
+        id="pinocchio-mount"
+        class="absolute inset-0 h-full w-full"
+        aria-label="Pure CSS Pinocchio"
+      />
+    </div>
+  </div>
+
+  <script>
+    import { mountHeroEmbed } from "../../lib/hero-embeds/loadHeroEmbed";
+
+    const el = document.getElementById("pinocchio-mount");
+    if (el) {
+      mountHeroEmbed({ basePath: "/hero-embeds/pinocchio", mountEl: el }).catch((e) => {
+        console.error(e);
+        el.textContent = "Failed to load embed.";
+      });
+    }
+  </script>
+</Layout>
+

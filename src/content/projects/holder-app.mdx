@@ -1,0 +1,233 @@
+---
+caseStudy: true
+title: "HolderApp"
+description: "End-to-end verifiable credentials on iOS: a holder wallet, verifier apps, Node issuer service, and shared Swift crypto — selective disclosure, proof-of-possession, and QR-mediated sessions."
+longDescription: "HolderApp is a portfolio demonstration of a full verifiable-credentials stack. An Express-based IssuerService provisions credentials; the Holder iOS app stores them in the Keychain and presents only what a policy asks for; Verifier iOS apps scan QR-encoded requests and responses to validate issuer signatures, disclosure integrity, freshness, and revocation. A Shared Swift package carries models and cryptography so holder and verifier stay aligned. The flow implements SD-JWT-style selective disclosure, ECDSA P-256 proof-of-possession, nonce-bound replay protection, and Status List 2021–style revocation checks."
+tags: ["Swift", "SwiftUI", "Cryptography"]
+thumbnail: "/images/holder/qr-demo.png"
+landingFrameHoverBg: /images/pill-hover-texture-reference3.png
+landingHoverChrome:
+  topRight: none
+  bottomRight: scraps
+landingHomepageHeroVideo: "/images/holder/holder-verifier-demo.mov"
+landingVideoPoster: "/images/holder/qr-demo.png"
+role: "Developer"
+technologies:
+  [
+    "Swift",
+    "SwiftUI",
+    "Node.js",
+    "Express",
+    "CryptoKit",
+    "JWK",
+    "ECDSA P-256",
+    "Keychain",
+    "AVFoundation",
+    "SD-JWT patterns",
+  ]
+link: "https://github.com/David-Chousal/HolderApp"
+year: 2025
+duration: "Proof-of-concept build"
+skills: ["iOS engineering", "Applied cryptography", "API design"]
+team: ["David Chousal"]
+tools: "Xcode, Node.js, Figma"
+note: "Hero frames and gallery use the project thumbnail and remote placeholders until a dedicated device capture pass."
+seoDescription: "HolderApp: iOS verifiable credentials with issuer service, selective disclosure, proof-of-possession, QR flows, and revocation — open source on GitHub."
+relatedLinks:
+  - href: "https://github.com/David-Chousal/HolderApp/blob/main/QUICKSTART.md"
+    label: "QUICKSTART — local setup"
+    kind: "public"
+  - href: "https://github.com/David-Chousal/HolderApp/blob/main/PROJECT_SUMMARY.md"
+    label: "PROJECT_SUMMARY — implementation detail"
+    kind: "public"
+heroVideos:
+  - url: "/images/holder/holder-verifier-demo.mov"
+    title: "Holder → verifier flow"
+  - url: "https://picsum.photos/seed/holderhero2/960/540"
+    title: "Credential presentation flow (placeholder)"
+toc:
+  - id: overview
+    label: Overview
+  - id: architecture
+    label: Architecture
+  - id: features
+    label: Features
+  - id: selective-disclosure
+    label: Selective disclosure
+  - id: security
+    label: Security
+  - id: implementation
+    label: Setup
+gallery:
+  - src: "/images/holder-app.png"
+    alt: "HolderApp credentials list view"
+  - src: "https://picsum.photos/seed/holderg1/800/600"
+    alt: "Placeholder — wallet chrome exploration"
+  - src: "https://picsum.photos/seed/holderg2/800/600"
+    alt: "Placeholder — disclosure sheet wireframe"
+videos:
+  - url: "https://www.youtube.com/watch?v=ScMzIvxBSi4"
+    title: "Demo reel placeholder (replace with HolderApp walkthrough)"
+---
+
+import CaseStudySection from "../../components/portfolio/CaseStudySection.astro";
+import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
+
+<CaseStudySection id="overview" kicker="HolderApp — verifiable credentials">
+
+<p class="font-case-mono text-[10px] uppercase text-case-ink/50 md:text-xs">Context</p>
+
+<h1>A complete issue-hold-verify loop for privacy-preserving credentials</h1>
+
+<p>
+  This project shows how verifiable credentials can work end-to-end on Apple platforms without turning the
+  holder into a passive data hose. An issuer provisions a credential, the holder stores it locally and
+  decides what to show, and a verifier requests specific attributes and checks authenticity — including
+  proof that the presenting device controls the credential and that the session has not been replayed.
+</p>
+
+<p>
+  Transport between phones is intentionally simple: JSON payloads moved by QR codes, so the demo stays
+  easy to run and audit without standing up a bespoke transport layer.
+</p>
+
+<figure class="not-prose mt-6 flex flex-col items-center">
+  <img
+    src="/images/holder/qr-demo.png"
+    alt="QR-mediated verifier request and holder response demo"
+    class="w-full max-w-[220px] rounded-lg border border-case-ink/10 bg-case-ink/[0.02]"
+    loading="lazy"
+  />
+  <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+    QR-mediated exchange — compact JSON request/response moves between devices without a bespoke transport layer.
+  </figcaption>
+</figure>
+
+</CaseStudySection>
+
+<CaseStudySection id="architecture" kicker="Architecture">
+
+<h2>Four moving parts, one protocol story</h2>
+
+<p>
+  The repository is organized as a small system rather than a single app. Each piece has a narrow job and
+  shares types and crypto where it matters.
+</p>
+
+<ul>
+  <li>
+    <strong>IssuerService (Node.js / Express)</strong> — Issues credentials and exposes the HTTP surface
+    the demo uses to provision holders.
+  </li>
+  <li>
+    <strong>HolderApp (iOS)</strong> — Stores credentials with device-bound keys, gates sensitive actions
+    with biometrics, and builds presentations when the user agrees.
+  </li>
+  <li>
+    <strong>VerifierApp (iOS)</strong> — Encodes verification requests (including session nonces), scans
+    the holder’s response QR, and runs the validation pipeline.
+  </li>
+  <li>
+    <strong>Shared (Swift package)</strong> — Holds shared models and cryptographic helpers so holder and
+    verifier implementations do not drift.
+  </li>
+</ul>
+
+<pre class="not-prose mt-4 overflow-x-auto rounded-lg border border-case-ink/10 bg-case-ink/[0.03] p-4 font-case-mono text-[11px] leading-relaxed text-case-ink/80 md:text-xs">
+IssuerService  --provisions--&gt;  HolderApp
+                                    |
+                            QR (request/response)
+                                    v
+                              VerifierApp
+</pre>
+
+</CaseStudySection>
+
+<CaseStudySection id="features" kicker="Features and highlights">
+
+<h2>What the stack demonstrates</h2>
+
+<ul>
+  <li>
+    <strong>Selective disclosure</strong> — SD-JWT-style presentations: only claims the verifier asked for
+    leave the holder device, backed by salted-hash disclosure paths.
+  </li>
+  <li>
+    <strong>Proof of possession</strong> — ECDSA P-256 signatures with device-bound keys so possession is
+    cryptographic, not just “I have a JPEG of a credential.”
+  </li>
+  <li>
+    <strong>Replay protection</strong> — Session-specific nonces bind a presentation to a single verifier
+    request.
+  </li>
+  <li>
+    <strong>Revocation</strong> — Status List 2021–style status checks so credentials can be invalidated
+    before natural expiry.
+  </li>
+  <li>
+    <strong>Biometric consent</strong> — Face ID / Touch ID gates high-risk actions so sharing is an
+    explicit, user-paced step.
+  </li>
+  <li>
+    <strong>Secure storage</strong> — Keychain with device-only access for key material appropriate to a
+    wallet-shaped PoC.
+  </li>
+  <li>
+    <strong>QR-mediated exchange</strong> — Request and response payloads as JSON in QR codes for
+    demonstrable, offline-friendly handoff between apps.
+  </li>
+  <li>
+    <strong>Verifier-side validation</strong> — Issuer signature verification, disclosure integrity,
+    freshness windows, and revocation are composed into a fail-closed path.
+  </li>
+</ul>
+
+</CaseStudySection>
+
+<CaseStudySection id="selective-disclosure" kicker="Selective disclosure">
+
+<h2>Share the minimum viable proof</h2>
+
+<p>
+  Verifiers rarely need the full credential graph. The holder flow is built around disclosing individual
+  claims and assembling only the hashes and disclosures a policy requires — aligned with SD-JWT-style
+  presentation patterns so auditors can map behavior to emerging standards language.
+</p>
+
+<ChallengeBlock>
+  How do you communicate cryptographic guarantees to users who should not need to read spec text?
+</ChallengeBlock>
+
+</CaseStudySection>
+
+<CaseStudySection id="security" kicker="Security and trust model">
+
+<h2>Biometrics at the gate, cryptography under the hood</h2>
+
+<p>
+  Sensitive actions sit behind the device trust model users already understand (Face ID / Touch ID). Under
+  that surface, presentations are time-bounded (<code>iat</code> / <code>exp</code>), tied to verifier
+  nonces, and signed with holder keys so verifiers get both issuer authenticity and proof of possession.
+</p>
+
+<p>
+  Validation is deliberately conservative: issuer signatures and disclosure hashes detect tampering;
+  freshness and nonce checks limit stale or copied payloads; revocation status is consulted so issuance
+  mistakes or policy changes can be enforced before expiry. The demo posture treats privacy as a product
+  constraint — minimal logging and no tracking narrative in the reference documentation.
+</p>
+
+</CaseStudySection>
+
+<CaseStudySection id="implementation" kicker="Setup">
+
+<h2>Running the demo locally</h2>
+
+<p>
+  The workspace bundles the iOS targets and shared package (<code>applewallet.xcworkspace</code>). Pair
+  that with the Node issuer: Xcode 15+ and iOS 16+ for the apps, Node.js 18+ for <code>IssuerService</code>,
+  as documented in the repository’s quick start.   The <strong>QUICKSTART</strong> and <strong>PROJECT_SUMMARY</strong> link cards above this write-up lead
+  to setup steps and a deeper walkthrough of code layout and security notes on GitHub.
+</p>
+
+</CaseStudySection>

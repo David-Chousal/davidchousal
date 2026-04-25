@@ -1,0 +1,354 @@
+---
+caseStudy: true
+title: "Kin"
+description: "A mobile app built to help families coordinate care — tracking routines, medications, and milestones across caregivers in one shared space."
+longDescription: "Kin is an Expo React Native app backed by Supabase: families authenticate, share a home timeline, and coordinate medications, tasks, visits, and health context with realtime sync, offline-first data fetching, push reminders, and a B2C subscription model (RevenueCat + Supabase effective tier). Edge Functions cover account deletion, RevenueCat webhooks, task push, and a tier-gated LLM gateway for visit prep and drug-interaction style flows."
+tags: ["React Native", "Expo", "Supabase"]
+thumbnail: "/images/kin-care.png"
+landingHomepageHeroVideo: /images/kin/kin-homepage-demo.mov
+landingVideoPoster: /images/kin/kin-home.png
+landingFrameHoverBg: /images/pill-hover-texture-reference.jpg
+landingMediaProminence: large
+landingHoverPillBgUrl: /images/kin/kin-home.png
+landingHoverChrome:
+  topRight: external
+  bottomRight: code
+role: "Lead Developer"
+technologies:
+  [
+    "React Native",
+    "Expo",
+    "TypeScript",
+    "Supabase",
+    "PostgreSQL",
+    "TanStack Query",
+    "Zustand",
+    "RevenueCat",
+    "Sentry",
+    "EAS",
+    "i18next",
+    "Edge Functions",
+  ]
+link: "https://github.com/David-Chousal/kin.care"
+year: 2025
+duration: "In development"
+skills: ["Product design", "Mobile engineering", "Realtime sync"]
+team: ["David Chousal"]
+tools: "Cursor, Figma, Expo, Supabase"
+note: "Screen captures and recordings are from the Expo dev client on device. Use the hero carousel at the top for mute-looped motion demos (home, i18n, AI summary)."
+seoDescription: "Kin: Expo + Supabase family care app with medications, tasks, realtime sync, RevenueCat subscriptions, Edge Functions, and tier-gated AI — open source at github.com/David-Chousal/kin.care."
+relatedLinks:
+  - href: "https://github.com/David-Chousal/kin.care"
+    label: "Repository — kin.care"
+    kind: "public"
+  - href: "https://github.com/David-Chousal/kin.care/tree/main/docs"
+    label: "Docs — store, subscriptions, QA"
+    kind: "public"
+  - href: "https://github.com/David-Chousal/kin.care/blob/main/docs/SUBSCRIPTION_MVP_SCOPE.md"
+    label: "SUBSCRIPTION_MVP_SCOPE — B2C tiers"
+    kind: "public"
+heroVideos:
+  - url: "/images/kin/kin-homepage-demo.mov"
+    title: "Home timeline"
+  - url: "/images/kin/kin-i18n-demo.mov"
+    title: "Localization"
+  - url: "/images/kin/kin-ai-summary-demo.mov"
+    title: "AI visit summary"
+toc:
+  - id: overview
+    label: Overview
+  - id: architecture
+    label: Architecture
+  - id: product
+    label: Product surface
+  - id: reliability
+    label: Sync and trust
+  - id: subscriptions
+    label: Subscriptions
+  - id: setup
+    label: Setup
+---
+
+import CaseStudySection from "../../components/portfolio/CaseStudySection.astro";
+import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
+
+<CaseStudySection id="overview" kicker="Kin — family coordination">
+
+<p class="font-case-mono text-[10px] uppercase text-case-ink/50 md:text-xs">The brief</p>
+
+<h1>Building a calmer operating system for caregiving</h1>
+
+<p>
+  Kin is the mobile surface for shared care: one place for the household and invited helpers to see what
+  matters today — medications, tasks, visits, and lightweight health context — without defaulting to a
+  parallel chat app for every handoff.
+</p>
+
+<p>
+  The shipping codebase is an <strong>Expo</strong> app (<code>slug</code> <code>kin-care</code>, deep link
+  scheme <code>kincare</code>) talking to <strong>Supabase</strong> for auth, Postgres, and realtime
+  channels. Auth sessions can complete from email magic links via <code>expo-linking</code> by parsing
+  Supabase hash tokens on cold start and URL events.
+</p>
+
+<figure class="not-prose my-8 w-[min(220px,78vw)] shrink-0 rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(260px,70vw)]">
+  <img
+    src="/images/kin/kin-home.png"
+    alt="Kin home feed showing daily care overview"
+    width="780"
+    height="1688"
+    class="mx-auto block w-full rounded-md"
+    loading="lazy"
+  />
+  <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+    Home — today’s feed and household context
+  </figcaption>
+</figure>
+
+</CaseStudySection>
+
+<CaseStudySection id="architecture" kicker="Architecture">
+
+<h2>Client, backend, and automation in one repo</h2>
+
+<h3 class="!mt-8 !mb-3 text-base font-semibold text-case-ink">Mobile client</h3>
+
+<ul>
+  <li>
+    <strong>Expo SDK 54 / React Native 0.81</strong> — Dev client, native modules for notifications, secure
+    store, image picker, localization, and more (<code>app.json</code> + config plugins).
+  </li>
+  <li>
+    <strong>Navigation</strong> — <code>@react-navigation</code> native stack; separate auth and main
+    stacks, post-auth onboarding gate, theme tokens wired to system / user preference.
+  </li>
+  <li>
+    <strong>Data layer</strong> — <strong>TanStack Query</strong> with <code>offlineFirst</code> network
+    mode for queries and mutations; network-status integration for resilient retries.
+  </li>
+  <li>
+    <strong>State</strong> — <strong>Zustand</strong> for auth and theme stores among others.
+  </li>
+  <li>
+    <strong>Observability</strong> — <strong>Sentry</strong> initialized at startup; React Query cache /
+    mutation errors forwarded for triage.
+  </li>
+  <li>
+    <strong>i18n</strong> — <code>i18next</code> / <code>react-i18next</code> with language sync hooks
+    (RTL phase-2 notes live in repo docs).
+  </li>
+</ul>
+
+<figure class="not-prose my-6 w-[min(200px,72vw)] rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:my-8 sm:w-[min(220px,50%)]">
+  <img
+    src="/images/kin/settings-page.png"
+    alt="Kin settings screen with language and preferences"
+    width="1206"
+    height="2622"
+    class="mx-auto block w-full rounded-md"
+    loading="lazy"
+  />
+  <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+    Settings — where locale, theme, and account prefs surface alongside i18n hooks
+  </figcaption>
+</figure>
+
+<h3 class="!mt-8 !mb-3 text-base font-semibold text-case-ink">Supabase backend</h3>
+
+<ul>
+  <li>
+    <strong>Postgres + migrations</strong> — Schema and RLS evolve in <code>supabase/migrations</code>.
+  </li>
+  <li>
+    <strong>Edge Functions</strong> — <code>delete-account</code>, <code>rc-webhook</code> (RevenueCat),
+    <code>send-task-push</code>, and <code>llm-gateway</code> (server-side LLM proxy with auth, tier checks,
+    rate limits, NDJSON streaming).
+  </li>
+</ul>
+
+<h3 class="!mt-8 !mb-3 text-base font-semibold text-case-ink">Monetization and release</h3>
+
+<ul>
+  <li>
+    <strong>RevenueCat</strong> — <code>react-native-purchases</code> (+ UI) with init/sync hooks tied to
+    auth lifecycle.
+  </li>
+  <li>
+    <strong>EAS</strong> — Profiles and scripts for preview/production builds and store submit
+    (<code>eas.json</code>, npm scripts).
+  </li>
+</ul>
+
+<pre class="not-prose mt-4 overflow-x-auto rounded-lg border border-case-ink/10 bg-case-ink/[0.03] p-4 font-case-mono text-[11px] leading-relaxed text-case-ink/80 md:text-xs">
+Expo app  --Supabase client--&gt;  Postgres / Auth / Realtime
+     |                              |
+     +------ Edge Functions (RC, push, LLM, delete) ------+
+</pre>
+
+</CaseStudySection>
+
+<CaseStudySection id="product" kicker="Product surface">
+
+<h2>Feature modules in the tree</h2>
+
+<p>
+  Screens and logic are grouped under <code>src/features/</code> — a useful map of what the app is trying
+  to cover in one coordinated product:
+</p>
+
+<ul>
+  <li>
+    <strong>Home &amp; family</strong> — <code>home</code>, <code>family</code> for the shared household
+    picture.
+  </li>
+  <li>
+    <strong>Clinical-adjacent coordination</strong> — <code>medications</code> (with dose reminder sync
+    hooks), <code>health</code>, <code>doctors</code>, <code>visitprep</code>.
+  </li>
+  <li>
+    <strong>Day-to-day ops</strong> — <code>tasks</code>, <code>checkins</code>, <code>calendar</code>,
+    <code>notes</code>, <code>documents</code>.
+  </li>
+  <li>
+    <strong>Account &amp; system</strong> — <code>auth</code>, <code>profile</code>, <code>settings</code>,
+    <code>notifications</code> (push token registration lives with notification feature code).
+  </li>
+</ul>
+
+<div class="not-prose my-8 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+  <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)]">
+    <img
+      src="/images/kin/medications-page.png"
+      alt="Kin medications screen with dose list and scheduling"
+      width="1206"
+      height="2622"
+      class="mx-auto block max-h-[min(340px,46vh)] w-auto rounded-md object-contain object-top"
+      loading="lazy"
+    />
+    <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+      <code class="text-case-ink/55">medications</code> — doses, schedule, and reminder sync
+    </figcaption>
+  </figure>
+  <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)]">
+    <img
+      src="/images/kin/doctors-page.png"
+      alt="Kin doctors directory and visit-related care"
+      width="1206"
+      height="2622"
+      class="mx-auto block max-h-[min(340px,46vh)] w-auto rounded-md object-contain object-top"
+      loading="lazy"
+    />
+    <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+      <code class="text-case-ink/55">doctors</code> / <code class="text-case-ink/55">visitprep</code> — care team and visits
+    </figcaption>
+  </figure>
+  <figure class="flex flex-col rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_10px_32px_-18px_rgba(42,37,32,0.18)] sm:col-span-2 lg:col-span-1">
+    <img
+      src="/images/kin/tasks-page.png"
+      alt="Kin tasks list for household day-to-day work"
+      width="1206"
+      height="2622"
+      class="mx-auto block max-h-[min(340px,46vh)] w-auto rounded-md object-contain object-top"
+      loading="lazy"
+    />
+    <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+      <code class="text-case-ink/55">tasks</code> — shared checklist across caregivers
+    </figcaption>
+  </figure>
+</div>
+
+<p>
+  The <code>llm-gateway</code> function exposes purpose-limited routes (e.g. visit prep, drug interactions)
+  so provider keys and quotas stay off-device and can respect <strong>effective subscription tier</strong>.
+</p>
+
+<figure class="not-prose my-8 w-[min(220px,82vw)] rounded-lg border border-case-ink/10 bg-case-ink/[0.02] p-2 shadow-[0_12px_40px_-20px_rgba(42,37,32,0.2)] sm:w-[min(260px,72%)]">
+  <video
+    class="mx-auto block w-full rounded-md"
+    controls
+    playsinline
+    preload="metadata"
+    poster="/images/kin/doctors-page.png"
+    src="/images/kin/kin-ai-summary-demo.mov"
+  />
+  <figcaption class="mt-2 font-case-mono text-[10px] leading-snug text-case-ink/45 sm:text-[11px]">
+    Visit prep — AI-assisted summary in-app (routed through <code class="text-case-ink/55">llm-gateway</code>)
+  </figcaption>
+</figure>
+
+<ChallengeBlock>
+  How do you keep medical and emotional context legible without overwhelming non-clinical caregivers?
+</ChallengeBlock>
+
+</CaseStudySection>
+
+<CaseStudySection id="reliability" kicker="Sync and trust">
+
+<h2>Realtime, offline-first, and reminders</h2>
+
+<ul>
+  <li>
+    <strong>Realtime sync</strong> — Dedicated hook wires Supabase realtime into the client data model so
+    multiple caregivers see updates without manual refresh.
+  </li>
+  <li>
+    <strong>Medication dose reminders</strong> — Sync hook aligns local notification scheduling with
+    server-backed medication state.
+  </li>
+  <li>
+    <strong>Connectivity UX</strong> — A connectivity banner surfaces degraded network state alongside
+    offline-first queries.
+  </li>
+  <li>
+    <strong>Trust posture</strong> — Errors surface to Sentry; mutations and queries default to cautious
+    network modes so the “happy path” stays honest when connectivity drops.
+  </li>
+</ul>
+
+</CaseStudySection>
+
+<CaseStudySection id="subscriptions" kicker="Subscriptions">
+
+<h2>B2C IAP and Supabase as source of truth</h2>
+
+<p>
+  The repo documents a <strong>B2C subscription MVP</strong>: consumer tiers only, with RevenueCat as the
+  mobile payment rail and Supabase storing derived entitlement state (including operator overrides for demos
+  or support).
+</p>
+
+<ul>
+  <li>
+    <strong>Tiers called out in docs</strong> — <strong>Core</strong> (free / display naming), <strong>Family</strong> ($4.99/mo), <strong>Care Team</strong> ($8.99/mo); internal <code>effective_tier</code> resolution is centralized for gating (including LLM caps on paid plans).
+  </li>
+  <li>
+    <strong>Webhook path</strong> — <code>rc-webhook</code> processes RevenueCat events into cache tables;
+    enterprise or agency billing is explicitly deferred to future epics in the same doc set.
+  </li>
+</ul>
+
+<p>
+  Store privacy, data safety, and go/no-go templates live under <code>docs/</code> for release discipline.
+</p>
+
+</CaseStudySection>
+
+<CaseStudySection id="setup" kicker="Setup">
+
+<h2>Running and shipping from the repo</h2>
+
+<p>
+  Clone <a href="https://github.com/David-Chousal/kin.care">github.com/David-Chousal/kin.care</a>, copy{" "}
+  <code>.env.example</code> to a local env file with Supabase and third-party keys, then <code>npm install</code>{" "}
+  and <code>npx expo start</code> (or platform run scripts). Supabase schema and functions apply from the{" "}
+  <code>supabase/</code> directory using the normal Supabase CLI workflow.
+</p>
+
+<p>
+  Production-style builds use <strong>EAS</strong> (<code>eas:build:preview</code>,{" "}
+  <code>eas:build:production</code>, <code>eas:submit:production</code>); legal pages can be regenerated via{" "}
+  <code>npm run build:legal</code>. Operational checklists (Sentry env verification, store readiness,
+  subscription QA) are in <strong>docs/</strong> — see the related link cards above.
+</p>
+
+</CaseStudySection>

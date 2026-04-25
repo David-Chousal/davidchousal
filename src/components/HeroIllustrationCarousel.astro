@@ -1,0 +1,390 @@
+---
+import type { HeroSlideDefinition } from "../lib/hero-carousel/types";
+import {
+  landingHeroIllustrationDefinitions,
+  moreWorkIllustrationDefinitions,
+} from "../lib/hero-carousel/heroCarousel";
+
+interface Props {
+  variant: "landing" | "footer";
+}
+
+const { variant } = Astro.props;
+
+const slides: HeroSlideDefinition[] =
+  variant === "landing" ? landingHeroIllustrationDefinitions : moreWorkIllustrationDefinitions;
+
+const rootId = variant === "landing" ? "landing-hero-illustration" : "footer-illustrations-carousel";
+const hideControls = slides.length <= 1;
+const regionLabel =
+  variant === "landing" ? "Featured illustration — Rive" : "More interactive illustrations";
+---
+
+<div
+  id={rootId}
+  class="flex h-full min-h-0 w-full min-w-0 flex-col items-stretch gap-3"
+  role="region"
+  aria-roledescription="carousel"
+  aria-label={regionLabel}
+  tabindex="0"
+  data-autoplay-ms="0"
+  data-illustration-carousel-mount
+  data-variant={variant}
+>
+  <div
+    class="relative min-h-0 min-w-0 flex-1 overflow-hidden rounded-sm ring-1 ring-black/[0.06] shadow-[0_20px_50px_-24px_rgba(42,37,32,0.15)]"
+    data-hero-carousel-track
+  >
+    {
+      slides.map((s, i) => (
+        <div
+          id={`${rootId}-panel-${i}`}
+          class:list={[
+            "absolute inset-0 transition-opacity duration-200 ease-out",
+            i === 0 ? "z-10 opacity-100" : "z-0 opacity-0 pointer-events-none",
+          ]}
+          data-hero-slide-panel
+          role="group"
+          aria-roledescription="slide"
+          aria-label={s.label}
+          aria-hidden={i === 0 ? "false" : "true"}
+          inert={i !== 0 ? true : undefined}
+        >
+          <div class="h-full w-full" data-hero-slide-mount />
+        </div>
+      ))
+    }
+  </div>
+
+  {
+    !hideControls && (
+      <div
+        class="flex w-full shrink-0 flex-wrap items-center justify-center gap-1 px-0.5 sm:gap-1.5"
+        role="toolbar"
+        aria-label="Carousel controls"
+      >
+        <button
+          type="button"
+          class="-m-0.5 inline-flex shrink-0 items-center justify-center rounded-sm p-1 text-[#2a2520]/55 transition-colors hover:text-[#2a2520]/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2520]/35 disabled:opacity-35"
+          data-hero-carousel-prev
+          aria-label="Previous slide"
+          aria-controls={`${rootId}-panel-0`}
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"></path>
+          </svg>
+        </button>
+        <div class="flex flex-wrap justify-center gap-1.5 px-0.5" role="tablist" aria-label="Slides">
+          {slides.map((s, i) => (
+            <button
+              type="button"
+              class:list={[
+                "h-2 w-2 rounded-full transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2520]/35",
+                i === 0 ? "bg-[#2a2520]/70" : "bg-[#2a2520]/20 hover:bg-[#2a2520]/40",
+              ]}
+              data-hero-carousel-dot
+              aria-label={`Go to slide ${i + 1}: ${s.label}`}
+              aria-selected={i === 0 ? "true" : "false"}
+              aria-current={i === 0 ? "true" : "false"}
+              tabindex={i === 0 ? 0 : -1}
+              role="tab"
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          class="-m-0.5 inline-flex shrink-0 items-center justify-center rounded-sm p-1 text-[#2a2520]/55 transition-colors hover:text-[#2a2520]/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2a2520]/35 disabled:opacity-35"
+          data-hero-carousel-next
+          aria-label="Next slide"
+          aria-controls={`${rootId}-panel-0`}
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"></path>
+          </svg>
+        </button>
+      </div>
+    )
+  }
+
+  <p class="sr-only" data-hero-carousel-live aria-live="polite" aria-atomic="true"></p>
+</div>
+
+<style is:global>
+  /* Transform-only on inner blob; outer .hero-css-blob-parallax handles centering + pointer offset */
+  @keyframes hero-blob-morph {
+    0%,
+    100% {
+      transform: scale(1) rotate(0deg);
+      border-radius: 42% 58% 70% 30% / 40% 40% 60% 60%;
+    }
+    33% {
+      transform: scale(1.04) rotate(2deg);
+      border-radius: 58% 42% 35% 65% / 55% 38% 62% 45%;
+    }
+    66% {
+      transform: scale(0.98) rotate(-1.5deg);
+      border-radius: 38% 62% 55% 45% / 48% 52% 40% 60%;
+    }
+  }
+  .hero-css-blob-morph {
+    animation: hero-blob-morph 14s ease-in-out infinite;
+  }
+  .hero-css-slide .hero-css-blob[data-mood="1"].hero-css-blob-morph {
+    animation-duration: 12s;
+  }
+  .hero-css-slide .hero-css-blob[data-mood="2"].hero-css-blob-morph {
+    animation-duration: 17s;
+  }
+  .hero-css-slide .hero-css-blob[data-mood="0"] {
+    background-image: linear-gradient(to bottom right, rgb(196 181 253 / 0.9), rgb(253 230 138 / 0.85)) !important;
+  }
+  .hero-css-slide .hero-css-blob[data-mood="1"] {
+    background-image: linear-gradient(to bottom right, rgb(125 211 252 / 0.9), rgb(167 243 208 / 0.85)) !important;
+  }
+  .hero-css-slide .hero-css-blob[data-mood="2"] {
+    background-image: linear-gradient(to bottom right, rgb(251 207 232 / 0.9), rgb(196 181 253 / 0.85)) !important;
+  }
+  @keyframes hero-blob-mood-flash-kf {
+    0% {
+      filter: brightness(1);
+    }
+    45% {
+      filter: brightness(1.05) hue-rotate(10deg);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+  .hero-css-slide .hero-css-blob.hero-css-blob-mood-flash {
+    animation: hero-blob-mood-flash-kf 0.18s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-css-slide .hero-css-blob.hero-css-blob-mood-flash {
+      animation: none;
+    }
+  }
+  @keyframes hero-mascot-proximity-squash {
+    0% {
+      transform: scale(1, 1);
+    }
+    40% {
+      transform: scale(1.06, 0.94);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+  .hero-css-slide .hero-css-mascot-proximity-squash .hero-css-mascot-body {
+    animation: hero-mascot-proximity-squash 0.38s ease-out;
+    transform-origin: 48px 58px;
+  }
+  .hero-css-slide .hero-css-mascot-proximity-mouth .hero-css-mouth-idle {
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  .hero-css-slide .hero-css-mascot-proximity-mouth .hero-css-mouth-warm {
+    opacity: 1;
+    transition: opacity 0.12s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-css-slide .hero-css-mascot-proximity-squash .hero-css-mascot-body {
+      animation: none;
+      opacity: 0.92;
+      transition: opacity 0.25s ease;
+    }
+  }
+  .hero-css-slide .hero-css-grain-svg {
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-css-slide .hero-css-grain-anim {
+      display: none;
+    }
+  }
+  .hero-css-slide .hero-css-floater {
+    position: absolute;
+    transform: translate3d(var(--hero-floater-px, 0px), var(--hero-floater-py, 0px), 0);
+    will-change: transform;
+  }
+  .hero-css-slide .hero-css-floater-motion {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    filter: blur(18px);
+    opacity: 0.45;
+  }
+  .hero-css-slide .hero-css-floater--1 {
+    left: 12%;
+    top: 18%;
+    width: 64px;
+    height: 64px;
+  }
+  .hero-css-slide .hero-css-floater-motion--1 {
+    background: rgb(196 181 253 / 0.5);
+    animation: hero-css-floater-drift-1 22s ease-in-out infinite;
+  }
+  .hero-css-slide .hero-css-floater--2 {
+    right: 14%;
+    top: 28%;
+    width: 48px;
+    height: 48px;
+  }
+  .hero-css-slide .hero-css-floater-motion--2 {
+    background: rgb(253 230 138 / 0.45);
+    animation: hero-css-floater-drift-2 18s ease-in-out infinite;
+  }
+  .hero-css-slide .hero-css-floater--3 {
+    left: 22%;
+    bottom: 26%;
+    width: 40px;
+    height: 40px;
+  }
+  .hero-css-slide .hero-css-floater-motion--3 {
+    background: rgb(167 243 208 / 0.4);
+    animation: hero-css-floater-drift-3 26s ease-in-out infinite;
+  }
+  .hero-css-slide .hero-css-floater--4 {
+    right: 20%;
+    bottom: 18%;
+    width: 56px;
+    height: 56px;
+  }
+  .hero-css-slide .hero-css-floater-motion--4 {
+    background: rgb(251 207 232 / 0.35);
+    animation: hero-css-floater-drift-4 20s ease-in-out infinite;
+  }
+  @keyframes hero-css-floater-drift-1 {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(10px, -14px);
+    }
+  }
+  @keyframes hero-css-floater-drift-2 {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(-12px, 10px);
+    }
+  }
+  @keyframes hero-css-floater-drift-3 {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(8px, 12px);
+    }
+  }
+  @keyframes hero-css-floater-drift-4 {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(-8px, -10px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-css-slide .hero-css-floater-motion--1,
+    .hero-css-slide .hero-css-floater-motion--2,
+    .hero-css-slide .hero-css-floater-motion--3,
+    .hero-css-slide .hero-css-floater-motion--4 {
+      animation: none;
+    }
+  }
+  @keyframes hero-mascot-boop {
+    0% {
+      transform: scale(1);
+    }
+    35% {
+      transform: scale(1.14) rotate(-4deg);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .hero-css-mascot-boop {
+    animation: hero-mascot-boop 0.45s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-css-mascot-boop {
+      animation: none;
+      transform: scale(1.06);
+      transition: transform 0.2s ease-out;
+    }
+  }
+  @keyframes hero-rive-wiggle {
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+    20% {
+      transform: rotate(-7deg) scale(1.05);
+    }
+    50% {
+      transform: rotate(6deg) scale(1.04);
+    }
+    80% {
+      transform: rotate(-3deg) scale(1.02);
+    }
+  }
+  .hero-rive-static-wiggle {
+    animation: hero-rive-wiggle 0.55s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-rive-static-wiggle {
+      animation: none;
+      opacity: 0.88;
+      transition: opacity 0.2s ease;
+    }
+  }
+  [data-hero-matter-slide] .hero-matter-chip-visual {
+    transition:
+      filter 0.22s ease,
+      opacity 0.22s ease;
+  }
+  [data-hero-matter-slide] .hero-matter-chip-visual.hero-matter-chip--hover {
+    filter: var(--matter-chip-hover-filter);
+  }
+  [data-hero-matter-slide] .hero-matter-chip-visual.hero-matter-chip--drag {
+    filter: var(--matter-chip-drag-filter);
+    opacity: 1;
+  }
+</style>
+
+<script>
+  import type { HeroSlideDefinition } from "../lib/hero-carousel/types";
+  import {
+    mountHeroCarousel,
+    landingHeroIllustrationDefinitions,
+    moreWorkIllustrationDefinitions,
+  } from "../lib/hero-carousel/heroCarousel";
+
+  const defsByVariant: Record<string, HeroSlideDefinition[]> = {
+    landing: landingHeroIllustrationDefinitions,
+    footer: moreWorkIllustrationDefinitions,
+  };
+
+  const disposers = new Map<string, () => void>();
+
+  function setupHeroCarousels() {
+    document.querySelectorAll<HTMLElement>("[data-illustration-carousel-mount]").forEach((root) => {
+      const v = root.dataset.variant;
+      if (!v) return;
+      const defs = defsByVariant[v];
+      if (!defs) return;
+      disposers.get(root.id)?.();
+      disposers.set(root.id, mountHeroCarousel(root, defs));
+    });
+  }
+
+  setupHeroCarousels();
+  document.addEventListener("astro:page-load", setupHeroCarousels);
+</script>

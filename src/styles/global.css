@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@theme {
+  --color-case-canvas: #f5f1ec;
+  --color-case-ink: #2a2520;
+  --font-case-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-case-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+.font-landing-sans {
+  font-family: var(--font-case-sans);
+}
+
+/** Alias for reference layouts (PP Mori is commercial; use DM Sans until licensed). */
+.font-pp-mori {
+  font-family: var(--font-case-sans);
+}
+
+.case-study-dot[data-on="true"] {
+  background-color: color-mix(in oklab, var(--color-case-ink) 60%, transparent);
+  transform: scale(1.2);
+}
+
+.case-study-dot[data-on="false"] {
+  background-color: color-mix(in oklab, var(--color-case-ink) 15%, transparent);
+  transform: scale(1);
+}
+
+.case-study-toc[data-active="true"] {
+  font-weight: 500;
+  color: color-mix(in oklab, var(--color-case-ink) 80%, transparent);
+}
+
+[data-hero-carousel] button[data-hero-dot][data-on="true"] .hero-dot-inner {
+  width: 2rem;
+  background-color: color-mix(in oklab, var(--color-case-ink) 35%, transparent);
+}
+
+.case-study-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 5px;
+  padding: 5px 10px 3px;
+  background:
+    radial-gradient(circle at 50% 120%, rgba(220, 224, 228, 0.4) 0%, rgba(180, 186, 194, 0.25) 50%, rgba(140, 148, 158, 0.15) 100%),
+    rgba(0, 0, 0, 0.03);
+  box-shadow:
+    rgba(255, 255, 255, 0.3) 0px 1px 0px inset,
+    rgba(0, 0, 0, 0.05) 0px 1px 2px;
+}
+
+.case-study-prose :where(h1) {
+  font-family: var(--font-case-sans);
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: color-mix(in oklab, var(--color-case-ink) 92%, transparent);
+}
+
+.case-study-prose :where(h2) {
+  font-family: var(--font-case-sans);
+  font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: color-mix(in oklab, var(--color-case-ink) 92%, transparent);
+}
+
+.case-study-prose :where(h3) {
+  font-family: var(--font-case-sans);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-weight: 400;
+  color: color-mix(in oklab, var(--color-case-ink) 88%, transparent);
+}
+
+.case-study-prose :where(h4) {
+  font-family: var(--font-case-sans);
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: color-mix(in oklab, var(--color-case-ink) 88%, transparent);
+}
+
+.case-study-prose :where(p) {
+  font-family: var(--font-case-sans);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: color-mix(in oklab, var(--color-case-ink) 58%, transparent);
+}
+
+@media (min-width: 768px) {
+  .case-study-prose :where(p) {
+    font-size: 1rem;
+  }
+}
+
+.case-study-prose :where(ul) {
+  list-style: disc;
+  padding-left: 1.25rem;
+  font-family: var(--font-case-sans);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: color-mix(in oklab, var(--color-case-ink) 58%, transparent);
+}
+
+.case-study-prose :where(li) {
+  margin-top: 0.35rem;
+}
+
+.case-study-prose :where(a) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: color-mix(in oklab, var(--color-case-ink) 72%, transparent);
+}
+
+.case-study-prose :where(a):hover {
+  color: var(--color-case-ink);
+}
+
+.case-study-prose :where(img) {
+  border-radius: 0.5rem;
+}
+
+.case-study-prose :where(figure) {
+  margin-top: 1rem;
+}
+
+.case-study-prose :where(figcaption) {
+  margin-top: 0.5rem;
+  font-family: var(--font-case-sans);
+  font-size: 0.875rem;
+  font-style: italic;
+  color: color-mix(in oklab, var(--color-case-ink) 48%, transparent);
+}

@@ -1,0 +1,25 @@
+---
+interface Props {
+  id: string;
+  kicker?: string;
+}
+
+const { id, kicker } = Astro.props;
+---
+
+<section
+  id={id}
+  data-case-section
+  class="scroll-mt-20 space-y-4 py-10 md:space-y-6 md:py-14"
+>
+  {
+    kicker && (
+      <p class="font-case-mono text-[10px] uppercase tracking-wider text-case-ink/50 md:text-xs">
+        {kicker}
+      </p>
+    )
+  }
+  <div class="case-study-prose space-y-3 md:space-y-4">
+    <slot />
+  </div>
+</section>

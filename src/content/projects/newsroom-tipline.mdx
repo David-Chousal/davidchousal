@@ -1,0 +1,285 @@
+---
+caseStudy: true
+title: "Newsroom Tipline"
+description: "A newsroom-style full-stack tool for collecting and moderating reader tips — privacy-first contact handling, editorial audit trail, and GCP-oriented deployment."
+longDescription: "Newsroom Tipline is a pnpm monorepo with a React 18 + Vite + TypeScript frontend and a Node.js + Fastify + TypeScript API backed by PostgreSQL and Prisma. Readers submit tips through a public, rate-limited form; editors work a moderation queue with tags, status, and a JSON audit trail. Contact data is never stored in plaintext (SHA-256 hash + explicit consent); internal cron tasks support ingestion and purging rejected tips. The repo documents Docker and Google Cloud Run + Cloud SQL deployment, Zod validation, Vitest, Playwright E2E, and WCAG 2.1 AA-oriented accessibility practices."
+tags: ["TypeScript", "React", "PostgreSQL"]
+thumbnail: "/images/newsroom-demo.png"
+landingFrameHoverBg: /images/pill-hover-texture-reference4.png
+landingHoverChrome:
+  topRight: external
+  bottomRight: scraps+code
+role: "Full-Stack Developer"
+technologies:
+  [
+    "TypeScript",
+    "React 18",
+    "Vite",
+    "Node.js",
+    "Fastify",
+    "PostgreSQL",
+    "Prisma",
+    "Zod",
+    "Docker",
+    "Google Cloud Run",
+    "Vitest",
+    "Playwright",
+  ]
+link: "https://github.com/David-Chousal/newsroom-tipline-webserver-front-and-back-end"
+year: 2025
+duration: "Shipped as academic / portfolio build"
+skills: ["API design", "Privacy-preserving storage", "Admin tooling"]
+team: ["David Chousal"]
+tools: "Cursor, TypeScript, Vite, Figma"
+note: "Hero and gallery mix the shipped thumbnail with Picsum placeholders until production screenshots and a narrated walkthrough exist."
+seoDescription: "Newsroom Tipline: React + Fastify + PostgreSQL tip intake and moderation with hashed contacts, audit trail, Zod validation, tests, and Docker/GCP docs — open source on GitHub."
+relatedLinks:
+  - href: "https://github.com/David-Chousal/newsroom-tipline-webserver-front-and-back-end"
+    label: "Repository — newsroom tipline"
+    kind: "public"
+  - href: "https://github.com/David-Chousal/newsroom-tipline-webserver-front-and-back-end/blob/main/QUICKSTART.md"
+    label: "QUICKSTART — local dev"
+    kind: "public"
+  - href: "https://github.com/David-Chousal/newsroom-tipline-webserver-front-and-back-end/blob/main/EDITORIAL_RATIONALE.md"
+    label: "EDITORIAL_RATIONALE — product framing"
+    kind: "public"
+heroVideos:
+  - url: "/images/newsroom-tipline.png"
+    title: "Tip submission (placeholder)"
+  - url: "https://picsum.photos/seed/newshero2/960/540"
+    title: "Moderation queue (placeholder)"
+toc:
+  - id: overview
+    label: Overview
+  - id: architecture
+    label: Architecture
+  - id: product
+    label: Product surface
+  - id: security
+    label: Security and privacy
+  - id: api
+    label: API and data
+  - id: quality-deploy
+    label: Quality and deployment
+  - id: setup
+    label: Setup
+gallery:
+  - src: "/images/newsroom-tipline.png"
+    alt: "Newsroom Tipline submission interface"
+  - src: "https://picsum.photos/seed/newsg1/800/600"
+    alt: "Placeholder — tip intake form states"
+  - src: "https://picsum.photos/seed/newsg2/800/600"
+    alt: "Placeholder — audit log timeline"
+---
+
+import CaseStudySection from "../../components/portfolio/CaseStudySection.astro";
+import ChallengeBlock from "../../components/portfolio/ChallengeBlock.astro";
+
+<CaseStudySection id="overview" kicker="Newsroom Tipline — secure tips">
+
+<p class="font-case-mono text-[10px] uppercase text-case-ink/50 md:text-xs">Problem</p>
+
+<h1>Let readers reach the desk without unnecessary exposure</h1>
+
+<p>
+  The system is built for a classic newsroom split: a <strong>public</strong> tip line where readers
+  submit a message and optional contact signal, and an <strong>internal</strong> moderation surface where
+  editors review, tag, approve or reject, and leave an accountable trail. Contact material is never stored
+  as reversible plaintext in the database path documented in the repo — only a hash plus explicit consent
+  — so follow-up stays intentional rather than accidental bulk PII retention.
+</p>
+
+<p>
+  The codebase is a <strong>pnpm workspace</strong> aimed at TypeScript end-to-end: a Vite React app for
+  the web UI and a Fastify API with Prisma on PostgreSQL, with Docker and Google Cloud Run + Cloud SQL
+  called out for production-shaped deployment.
+</p>
+
+</CaseStudySection>
+
+<CaseStudySection id="architecture" kicker="Architecture">
+
+<h2>Monorepo layout and stack</h2>
+
+<ul>
+  <li>
+    <strong>Frontend</strong> — <code>apps/web</code>: React 18, Vite, TypeScript.
+  </li>
+  <li>
+    <strong>Backend</strong> — <code>apps/api</code>: Node.js, <strong>Fastify</strong>, TypeScript.
+  </li>
+  <li>
+    <strong>Shared tooling</strong> — <code>packages/config</code> for ESLint, Prettier, and TypeScript
+    baselines across apps.
+  </li>
+  <li>
+    <strong>Data</strong> — PostgreSQL with <strong>Prisma</strong> migrations and schema; <strong>Zod</strong> for request validation at the boundary.
+  </li>
+  <li>
+    <strong>Runtime packaging</strong> — Dockerfiles per app; <code>docker-compose.yml</code> and <strong>DOCKER_SETUP.md</strong> support local parity.
+  </li>
+  <li>
+    <strong>Cloud shape</strong> — README documents <strong>Cloud Run</strong> services plus <strong>Cloud SQL</strong> (PostgreSQL), Secret Manager for connection strings and cron secrets, and
+    Cloud Scheduler for scheduled tasks (e.g. purge rejected tips).
+  </li>
+</ul>
+
+<pre class="not-prose mt-4 overflow-x-auto rounded-lg border border-case-ink/10 bg-case-ink/[0.03] p-4 font-case-mono text-[11px] leading-relaxed text-case-ink/80 md:text-xs">
+Reader  --POST /api/tips--&gt;  Fastify API  --Prisma--&gt;  PostgreSQL
+                                |
+Editor  --moderation API--&gt;  (auth TODO in README)
+</pre>
+
+</CaseStudySection>
+
+<CaseStudySection id="product" kicker="Product surface">
+
+<h2>What ships in scope</h2>
+
+<ul>
+  <li>
+    <strong>Public tip submission</strong> — Message field (length bounds per schema), optional contact
+    channel, explicit consent, rate limiting on the public route.
+  </li>
+  <li>
+    <strong>Moderation queue</strong> — List and filter tips (e.g. by <code>pending</code> status); patch
+    workflow for approve / reject / tag-style updates as implemented in the API.
+  </li>
+  <li>
+    <strong>Audit trail</strong> — Each tip carries a structured audit history (actor, action, timestamp) so
+    newsroom decisions are defensible after the fact.
+  </li>
+  <li>
+    <strong>Accessibility posture</strong> — WCAG 2.1 AA stated target; keyboard navigation and screen
+    reader support; <code>jsx-a11y</code> in CI per README.
+  </li>
+  <li>
+    <strong>Operational tasks</strong> — Internal cron-style endpoints (shared secret) for feed ingestion
+    and for purging old rejected tips on a schedule.
+  </li>
+</ul>
+
+</CaseStudySection>
+
+<CaseStudySection id="security" kicker="Security and privacy">
+
+<h2>Threats the README calls out explicitly</h2>
+
+<ul>
+  <li>
+    <strong>PII minimization</strong> — Contact information is hashed (SHA-256) before persistence; raw
+    email/phone is not stored.
+  </li>
+  <li>
+    <strong>Consent</strong> — Boolean consent stored with the tip when the reader agrees to follow-up.
+  </li>
+  <li>
+    <strong>Abuse</strong> — Public <code>POST /api/tips</code> is rate-limited (documented as 10 requests
+    per 15 minutes); honeypot field on the form for bot noise.
+  </li>
+  <li>
+    <strong>Retention</strong> — Rejected tips can be auto-purged after 90 days (configurable), reducing
+    long-tail liability.
+  </li>
+  <li>
+    <strong>Transport and browser policy</strong> — CORS locked to production domains in the documented
+    deployment story.
+  </li>
+  <li>
+    <strong>Authentication gap (honest)</strong> — README lists moderation auth as <strong>TODO</strong>:
+    OAuth provider, JWT middleware, protected routes, and reviewer IDs fully wired into audit metadata are
+    the next hardening layer.
+  </li>
+</ul>
+
+<ChallengeBlock>
+  How do you help editors collaborate without turning the database into a passive surveillance artifact?
+</ChallengeBlock>
+
+</CaseStudySection>
+
+<CaseStudySection id="api" kicker="API and data">
+
+<h2>Endpoints and tip model (from repo docs)</h2>
+
+<h3 class="!mt-8 !mb-3 text-base font-semibold text-case-ink">Public</h3>
+
+<ul>
+  <li>
+    <code>POST /api/tips</code> — Submit a tip (rate-limited).
+  </li>
+  <li>
+    <code>GET /healthz</code> — Health check for orchestration.
+  </li>
+</ul>
+
+<h3 class="!mt-8 !mb-3 text-base font-semibold text-case-ink">Protected (moderation; auth per roadmap)</h3>
+
+<ul>
+  <li>
+    <code>GET /api/tips?status=pending</code> — Filtered listing.
+  </li>
+  <li>
+    <code>PATCH /api/tips/:id</code> — Update status, tags, and related moderation fields.
+  </li>
+</ul>
+
+<h3 class="!mt-8 !mb-3 text-base font-semibold text-case-ink">Internal (cron)</h3>
+
+<ul>
+  <li>
+    <code>POST /tasks/ingest</code> — Feed ingestion (e.g. “Live Results” style pipelines).
+  </li>
+  <li>
+    <code>POST /tasks/purge-rejected</code> — Purge stale rejected tips.
+  </li>
+</ul>
+
+<p>
+  The documented <strong>Tip</strong> entity includes CUID <code>id</code>, timestamps, bounded <code>message</code>, <code>contactHash</code>, <code>consent</code>, <code>status</code> (<code>pending</code> | <code>approved</code> | <code>rejected</code>), string <code>tags</code>, optional <code>reviewerId</code> once auth lands, and the <code>audit</code> JSON array.
+</p>
+
+</CaseStudySection>
+
+<CaseStudySection id="quality-deploy" kicker="Quality and deployment">
+
+<h2>Tests, a11y, and GCP</h2>
+
+<ul>
+  <li>
+    <strong>Unit / API tests</strong> — Vitest from workspace root (<code>pnpm test</code>).
+  </li>
+  <li>
+    <strong>E2E</strong> — Playwright via <code>pnpm --filter @tipline/web test:e2e</code> (package name as in
+    README).
+  </li>
+  <li>
+    <strong>Accessibility</strong> — Automated linting plus manual keyboard and screen reader passes as
+    recommended in docs.
+  </li>
+  <li>
+    <strong>GCP deployment outline</strong> — Cloud SQL Postgres, Artifact Registry / GCR image push, two
+    Cloud Run services (API + static/SSR web image per Dockerfile), secrets in Secret Manager, and
+    Scheduler invoking purge with an <code>x-cron-secret</code> header pattern.
+  </li>
+</ul>
+
+</CaseStudySection>
+
+<CaseStudySection id="setup" kicker="Setup">
+
+<h2>Local development</h2>
+
+<p>
+  Prerequisites: <strong>Node.js 18+</strong>, <strong>pnpm 9+</strong>, and PostgreSQL 14+ (local,
+  Docker, or a hosted instance — <strong>SETUP_POSTGRES.md</strong> documents low-friction options). Clone <a href="https://github.com/David-Chousal/newsroom-tipline-webserver-front-and-back-end">the repository</a>, run <code>pnpm install</code>, copy <code>apps/api/.env.example</code> to <code>apps/api/.env</code> with
+  a valid <code>DATABASE_URL</code>, then from <code>apps/api</code> run Prisma generate and migrate. From
+  the repo root, <code>pnpm dev</code> starts the Vite frontend on port <strong>3000</strong> and the API
+  on <strong>3001</strong> as documented in <strong>QUICKSTART.md</strong>.
+</p>
+
+<p>
+  For editorial framing and risk language aligned to newsroom ethics, see <strong>EDITORIAL_RATIONALE.md</strong>; for container-based workflows, <strong>DOCKER_SETUP.md</strong> and <strong>PROJECT_SUMMARY.md</strong> round out implementation detail on GitHub.
+</p>
+
+</CaseStudySection>
