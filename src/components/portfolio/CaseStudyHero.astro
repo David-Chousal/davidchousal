@@ -17,9 +17,11 @@ interface Props {
 }
 
 const { title, description, tags, year, logo, heroVideos, thumbnail, pillAmbientBgUrl } = Astro.props;
+import { withBase } from "../../lib/withBase";
 
-const pillAmbientStyle = pillAmbientBgUrl
-  ? { backgroundImage: `url("${pillAmbientBgUrl.replace(/"/g, "%22")}")` }
+const pillAmbientResolved = pillAmbientBgUrl ? withBase(pillAmbientBgUrl) : undefined;
+const pillAmbientStyle = pillAmbientResolved
+  ? { backgroundImage: `url("${pillAmbientResolved.replace(/"/g, "%22")}")` }
   : undefined;
 
 const isYouTubeUrl = (url: string): boolean =>
@@ -38,6 +40,7 @@ const getEmbedUrl = (url: string): string =>
 
 const slides = heroVideos && heroVideos.length > 0 ? heroVideos : null;
 const yearStr = year != null ? String(year) : "";
+const thumbUrl = withBase(thumbnail);
 ---
 
 <section class="w-full p-4 pt-20 md:pt-8">
@@ -49,7 +52,7 @@ const yearStr = year != null ? String(year) : "";
         </h3>
         {
           logo && (
-            <img src={logo} alt="" class="h-[14px] w-auto shrink-0 object-contain md:h-4" width="80" height="16" />
+            <img src={withBase(logo)} alt="" class="h-[14px] w-auto shrink-0 object-contain md:h-4" width="80" height="16" />
           )
         }
       </div>
@@ -129,7 +132,7 @@ const yearStr = year != null ? String(year) : "";
                       )}
                       {isVideoUrl(video.url) && (
                         <video
-                          src={video.url}
+                          src={withBase(video.url)}
                           title={video.title}
                           class="h-auto max-h-full w-auto max-w-full rounded-md object-contain shadow-[0_16px_48px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10"
                           muted
@@ -141,7 +144,7 @@ const yearStr = year != null ? String(year) : "";
                       )}
                       {!isYouTubeUrl(video.url) && !isVideoUrl(video.url) && (
                         <img
-                          src={thumbnail}
+                          src={thumbUrl}
                           alt={video.title}
                           class="h-auto max-h-full w-auto max-w-full rounded-md object-contain shadow-[0_16px_48px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10"
                           loading="lazy"
@@ -152,7 +155,7 @@ const yearStr = year != null ? String(year) : "";
                 ) : (
                   <div class="flex h-full min-h-0 w-full items-center justify-center">
                     <img
-                      src={thumbnail}
+                      src={thumbUrl}
                       alt={title}
                       class="h-auto max-h-full w-auto max-w-full rounded-md object-contain shadow-[0_16px_48px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10"
                       loading="eager"

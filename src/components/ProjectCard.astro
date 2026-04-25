@@ -2,6 +2,7 @@
 import type { LocalImageProps } from "astro:assets";
 import { Image } from "astro:assets";
 import ProjectCardHoverChrome from "./ProjectCardHoverChrome.astro";
+import { withBase } from "../lib/withBase";
 
 type RasterMeta = Extract<LocalImageProps["src"], { width: number; height: number }>;
 
@@ -58,10 +59,15 @@ const {
 const isLanding = variant === "landing";
 const showVideo = Boolean(previewVideoUrl && /\.(mp4|webm|mov)(\?|$)/i.test(previewVideoUrl));
 const videoHero = Boolean(landingVideoHero && showVideo);
-const posterForVideo = videoPosterUrl ?? thumbnail;
+const posterForVideo = withBase(videoPosterUrl ?? thumbnail);
+const thumbUrl = withBase(thumbnail);
+const previewVideoSrc = previewVideoUrl ? withBase(previewVideoUrl) : undefined;
+const projectHref = withBase(`/projects/${slug}`);
+const pillHoverBgResolved = pillHoverBgUrl ? withBase(pillHoverBgUrl) : undefined;
+const frameHoverBgResolved = landingFrameHoverBg ? withBase(landingFrameHoverBg) : undefined;
 
-const frameHoverImageStyle = landingFrameHoverBg
-  ? { backgroundImage: `url("${landingFrameHoverBg.replace(/"/g, "%22")}")` }
+const frameHoverImageStyle = frameHoverBgResolved
+  ? { backgroundImage: `url("${frameHoverBgResolved.replace(/"/g, "%22")}")` }
   : undefined;
 
 const frameOuter = isLanding
@@ -108,7 +114,7 @@ const landingMediaBoxClass = videoHero
 ---
 
 <a
-  href={`/projects/${slug}`}
+  href={projectHref}
   class:list={[
     isLanding ? "group flex cursor-pointer flex-col" : "group block cursor-pointer",
     !isLanding && "transition-[opacity,transform] duration-200 hover:opacity-90",
@@ -187,7 +193,7 @@ const landingMediaBoxClass = videoHero
                       />
                     ) : (
                       <img
-                        src={thumbnail}
+                        src={thumbUrl}
                         alt={title}
                         class="max-h-full max-w-full object-contain"
                         loading="lazy"
@@ -197,7 +203,7 @@ const landingMediaBoxClass = videoHero
                   </div>
                   {showVideo && (
                     <video
-                      src={previewVideoUrl}
+                      src={previewVideoSrc}
                       class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-contain opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
                       muted
                       loop
@@ -219,7 +225,7 @@ const landingMediaBoxClass = videoHero
                     decoding="async"
                   />
                   <video
-                    src={previewVideoUrl}
+                    src={previewVideoSrc}
                     class="pointer-events-none absolute inset-0 z-[1] h-full w-full object-contain opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
                     muted
                     loop
@@ -232,7 +238,7 @@ const landingMediaBoxClass = videoHero
             </div>
           </div>
 
-          <ProjectCardHoverChrome chrome={landingHoverChrome} pillHoverBgUrl={pillHoverBgUrl} />
+          <ProjectCardHoverChrome chrome={landingHoverChrome} pillHoverBgUrl={pillHoverBgResolved} />
         </div>
 
         <div class="px-1">
@@ -257,7 +263,7 @@ const landingMediaBoxClass = videoHero
         <div class={frameOuter}>
           <div class={frameInner}>
             <img
-              src={thumbnail}
+              src={thumbUrl}
               alt={title}
               class:list={[
                 "h-full w-full object-cover",
