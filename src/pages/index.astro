@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import HeroIllustrationCarousel from "../components/HeroIllustrationCarousel.astro";
+import { withBase } from "../lib/withBase";
 
 /** Featured first (grid order), then the rest alphabetically by slug */
 const FRONT_RUNNER_IDS = ["kin-care", "t-jazz-pro"];
@@ -96,7 +97,7 @@ const defaultLandingChrome = { topRight: "none" as const, bottomRight: "code" as
     </div>
     <div class="flex justify-center pb-8 pt-8">
       <a
-        href="/extras"
+        href={withBase("/extras")}
         class="font-pp-mori text-xs text-[#2a2520]/50 transition-colors hover:text-[#2a2520]/80"
       >
         SEE MORE WORK →

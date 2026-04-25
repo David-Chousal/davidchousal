@@ -10,6 +10,7 @@ interface Props {
 }
 
 const { projectTitle, toc } = Astro.props;
+import { withBase } from "../../lib/withBase";
 ---
 
 <div
@@ -28,7 +29,7 @@ const { projectTitle, toc } = Astro.props;
   <div class="shrink-0 border-b border-case-ink/[0.06] pb-4 md:border-0">
     <div class="space-y-5 pt-2 md:pt-0">
       <a
-        href="/"
+        href={withBase("/")}
         class="group mb-1 flex items-center gap-2 font-case-mono text-xs text-case-ink/55 transition-colors duration-200 hover:text-case-ink/75"
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="text-case-ink/55 group-hover:text-case-ink/75" aria-hidden="true">

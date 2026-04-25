@@ -10,6 +10,7 @@ import CaseStudyHero from "../../components/portfolio/CaseStudyHero.astro";
 import CaseStudyMetaGrid from "../../components/portfolio/CaseStudyMetaGrid.astro";
 import CaseStudyLinks from "../../components/portfolio/CaseStudyLinks.astro";
 import NoteCallout from "../../components/portfolio/NoteCallout.astro";
+import { withBase } from "../../lib/withBase";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -49,9 +50,9 @@ const pageDescription = data.seoDescription ?? data.description;
 const themeColor = isCaseStudy ? "#f5f1ec" : undefined;
 
 const bottomNav = [
-  { label: "Work", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Extras", href: "/extras" },
+  { label: "Work", href: withBase("/") },
+  { label: "About", href: withBase("/about") },
+  { label: "Extras", href: withBase("/extras") },
 ];
 
 const toc =
@@ -121,7 +122,7 @@ const toc =
       </CaseStudyShell>
     ) : (
       <div class="mx-auto max-w-4xl px-0 py-0 md:px-0">
-        <a href="/" class="mb-8 inline-block font-medium text-blue-600 hover:text-blue-700">
+        <a href={withBase("/")} class="mb-8 inline-block font-medium text-blue-600 hover:text-blue-700">
           ← Back to Projects
         </a>
 
@@ -142,7 +143,7 @@ const toc =
         {data.videos && <ProjectMedia videos={data.videos} />}
 
         <div class="mt-16 border-t border-gray-200 pt-8">
-          <a href="/" class="font-medium text-blue-600 hover:text-blue-700">
+          <a href={withBase("/")} class="font-medium text-blue-600 hover:text-blue-700">
             ← Back to all projects
           </a>
         </div>

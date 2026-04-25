@@ -13,6 +13,7 @@ interface Props {
 
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
+import { withBase } from "../lib/withBase";
 
 const {
   title = "David Chousal",
@@ -24,9 +25,9 @@ const {
 const isCaseStudy = variant === "caseStudy";
 const isCream = siteTone === "cream";
 const nav = [
-  { label: "Work", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Extras", href: "/extras" },
+  { label: "Work", href: withBase("/") },
+  { label: "About", href: withBase("/about") },
+  { label: "Extras", href: withBase("/extras") },
 ];
 const currentPath = Astro.url.pathname;
 
@@ -49,7 +50,7 @@ const navLinkCream = (href: string) =>
       content={description ?? "David Chousal — portfolio"}
     />
     <title>{title}</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
     <ClientRouter />
     {(themeColor || isCream) && <meta name="theme-color" content={themeColor ?? "#f5f1ec"} />}
     {
@@ -64,43 +65,6 @@ const navLinkCream = (href: string) =>
         </>
       )
     }
-    <style is:global>
-      @media (prefers-reduced-motion: reduce) {
-        ::view-transition-old(root),
-        ::view-transition-new(root) {
-          animation: none !important;
-        }
-      }
-
-      /* Subtle navigation transitions */
-      ::view-transition-old(root) {
-        animation: dc-fade-out 160ms ease both;
-      }
-      ::view-transition-new(root) {
-        animation: dc-fade-in 220ms ease both;
-      }
-
-      @keyframes dc-fade-out {
-        from {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        to {
-          opacity: 0;
-          transform: translateY(6px);
-        }
-      }
-      @keyframes dc-fade-in {
-        from {
-          opacity: 0;
-          transform: translateY(-6px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    </style>
   </head>
   <body
     class:list={[
@@ -122,7 +86,7 @@ const navLinkCream = (href: string) =>
             <div class="mx-auto w-full max-w-[900px] px-4 py-4 sm:w-[70vw]">
               <div class="hidden items-start sm:grid sm:grid-cols-3">
                 <a
-                  href="/"
+                  href={withBase("/")}
                   class="group justify-self-start transition-opacity hover:opacity-70"
                 >
                   <h1 class="font-case-sans text-xs font-bold tracking-tight leading-none text-[#2a2520]">
@@ -215,7 +179,7 @@ const navLinkCream = (href: string) =>
               <div class="sm:hidden">
                 <div class="flex flex-col gap-4">
                   <div class="flex items-start justify-between gap-4">
-                    <a href="/" class="group min-w-0 transition-opacity hover:opacity-70">
+                    <a href={withBase("/")} class="group min-w-0 transition-opacity hover:opacity-70">
                       <h1 class="font-case-sans text-sm font-bold tracking-tight leading-none text-[#2a2520]">
                         DAVID CHOUSAL
                       </h1>
@@ -311,7 +275,7 @@ const navLinkCream = (href: string) =>
               "flex items-center justify-between border-b border-gray-100 px-6 py-6 md:px-12",
             ]}
           >
-            <a href="/" class="text-sm font-medium tracking-tight transition-opacity hover:opacity-60">
+            <a href={withBase("/")} class="text-sm font-medium tracking-tight transition-opacity hover:opacity-60">
               <span class="block">David Chousal</span>
             </a>
             <div class="flex items-center gap-6">
@@ -395,10 +359,10 @@ const navLinkCream = (href: string) =>
             <>
               <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-black/[0.06] py-6">
                 <a
-                  href="/"
+                  href={withBase("/")}
                   class:list={[
                     "text-[11px] tracking-wide transition-colors",
-                    currentPath === "/"
+                    currentPath === withBase("/")
                       ? "font-medium text-[#2a2520]/80"
                       : "text-[#2a2520]/35 hover:text-[#2a2520]/65",
                   ]}
@@ -406,19 +370,19 @@ const navLinkCream = (href: string) =>
                   HOME
                 </a>
                 <a
-                  href="/#projects-grid"
+                  href={withBase("/#projects-grid")}
                   class="text-[11px] tracking-wide text-[#2a2520]/35 transition-colors hover:text-[#2a2520]/65"
                 >
                   WORK
                 </a>
                 <a
-                  href="/about"
+                  href={withBase("/about")}
                   class="text-[11px] tracking-wide text-[#2a2520]/35 transition-colors hover:text-[#2a2520]/65"
                 >
                   ABOUT
                 </a>
                 <a
-                  href="/extras"
+                  href={withBase("/extras")}
                   class="text-[11px] tracking-wide text-[#2a2520]/35 transition-colors hover:text-[#2a2520]/65"
                 >
                   EXTRAS
