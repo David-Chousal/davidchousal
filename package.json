@@ -10,7 +10,7 @@
     "predev": "npm run sync-hero-embeds",
     "prebuild": "npm run sync-hero-embeds",
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build --force",
     "preview": "astro preview",
     "astro": "astro"
   },
